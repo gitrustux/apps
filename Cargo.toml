@@ -1,0 +1,32 @@
+[workspace]
+resolver = "2"
+members = [
+    # CLI Applications
+    "cli/redit",
+    "cli/net-tools",
+    "cli/sys-tools",
+
+    # GUI Applications
+    "gui/aurora-shell",
+    "gui/aurora-panel",
+    "gui/aurora-launcher",
+
+    # Shared Libraries
+    "libs/rutils",
+    "libs/rgui",
+    "libs/netlib",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+authors = ["The Rustux Authors"]
+homepage = "https://rustux.com"
+repository = "https://github.com/gitrustux/apps"
+
+[workspace.dependencies]
+# Common dependencies can be specified here
+# rutils = { path = "libs/rutils" }
+# rgui = { path = "libs/rgui" }
+# netlib = { path = "libs/netlib" }

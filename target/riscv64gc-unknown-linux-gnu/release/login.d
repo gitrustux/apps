@@ -1,0 +1,1 @@
+/var/www/rustux.com/prod/apps/target/riscv64gc-unknown-linux-gnu/release/login: /var/www/rustux.com/prod/apps/cli/login/src/main.rs /var/www/rustux.com/prod/apps/libs/rutils/src/auth.rs /var/www/rustux.com/prod/apps/libs/rutils/src/file.rs /var/www/rustux.com/prod/apps/libs/rutils/src/lib.rs /var/www/rustux.com/prod/apps/libs/rutils/src/process.rs

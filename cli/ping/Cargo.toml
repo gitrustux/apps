@@ -1,0 +1,18 @@
+[package]
+name = "ping"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "ping"
+path = "src/main.rs"
+
+[dependencies]
+anyhow.workspace = true
+thiserror.workspace = true
+clap.workspace = true
+log.workspace = true
+netlib = { path = "../../libs/netlib" }
+nix = { version = "0.27", features = ["socket"] }
+libc.workspace = true

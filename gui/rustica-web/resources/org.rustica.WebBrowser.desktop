@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=Rustica Web
+GenericName=Web Browser
+Comment=A modern, secure, privacy-focused web browser
+Exec=rustica-web %U
+Terminal=false
+Type=Application
+Icon=org.rustica.WebBrowser
+Categories=Network;WebBrowser;GTK;
+StartupNotify=true
+MimeType=text/html;text/xml;application/xhtml+xml;application/xml;application/vnd.mozilla.xul+xml;text/mml;x-scheme-handler/http;x-scheme-handler/https;x-scheme-handler/ftp;
+Keywords=Internet;WWW;Browser;Web;Explorer

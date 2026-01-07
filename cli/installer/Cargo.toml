@@ -1,0 +1,20 @@
+# Copyright 2025 The Rustux Authors
+#
+# Use of this source code is governed by a MIT-style
+# license that can be found in the LICENSE file or at
+# https://opensource.org/licenses/MIT
+
+[package]
+name = "rustux-install"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = { workspace = true }
+clap = { workspace = true }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+[target.x86_64-unknown-linux-gnu.dependencies]
+# Linux-specific dependencies for disk operations
+nix = { version = "0.27", features = ["mount", "sched"] }

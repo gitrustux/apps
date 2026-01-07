@@ -1,0 +1,12 @@
+/var/www/rustux.com/prod/apps/target/debug/deps/poly1305-fdb145dff7fa35d7.d: /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/poly1305-0.8.0/src/lib.rs /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/poly1305-0.8.0/src/backend.rs /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/poly1305-0.8.0/src/backend/avx2.rs /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/poly1305-0.8.0/src/backend/avx2/helpers.rs /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/poly1305-0.8.0/src/backend/autodetect.rs /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/poly1305-0.8.0/src/backend/soft.rs
+
+/var/www/rustux.com/prod/apps/target/debug/deps/libpoly1305-fdb145dff7fa35d7.rlib: /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/poly1305-0.8.0/src/lib.rs /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/poly1305-0.8.0/src/backend.rs /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/poly1305-0.8.0/src/backend/avx2.rs /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/poly1305-0.8.0/src/backend/avx2/helpers.rs /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/poly1305-0.8.0/src/backend/autodetect.rs /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/poly1305-0.8.0/src/backend/soft.rs
+
+/var/www/rustux.com/prod/apps/target/debug/deps/libpoly1305-fdb145dff7fa35d7.rmeta: /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/poly1305-0.8.0/src/lib.rs /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/poly1305-0.8.0/src/backend.rs /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/poly1305-0.8.0/src/backend/avx2.rs /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/poly1305-0.8.0/src/backend/avx2/helpers.rs /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/poly1305-0.8.0/src/backend/autodetect.rs /root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/poly1305-0.8.0/src/backend/soft.rs
+
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/poly1305-0.8.0/src/lib.rs:
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/poly1305-0.8.0/src/backend.rs:
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/poly1305-0.8.0/src/backend/avx2.rs:
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/poly1305-0.8.0/src/backend/avx2/helpers.rs:
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/poly1305-0.8.0/src/backend/autodetect.rs:
+/root/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/poly1305-0.8.0/src/backend/soft.rs:

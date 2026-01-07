@@ -1,0 +1,16 @@
+# Copyright 2025 The Rustux Authors
+#
+# Use of this source code is governed by a MIT-style
+# license that can be found in the LICENSE file or at
+# https://opensource.org/licenses/MIT
+
+[package]
+name = "rustux-tar"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = { workspace = true }
+clap = { workspace = true }
+flate2 = "1.0"
+tar = "0.4"

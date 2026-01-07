@@ -1,0 +1,18 @@
+[package]
+name = "login"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "login"
+path = "src/main.rs"
+
+[dependencies]
+anyhow.workspace = true
+thiserror.workspace = true
+clap.workspace = true
+log.workspace = true
+rutils = { path = "../../libs/rutils" }
+nix.workspace = true
+libc.workspace = true

@@ -1,0 +1,59 @@
+[package]
+name = "rustica-comp"
+version = "0.1.0"
+edition = "2021"
+authors = ["Rustica OS Developers"]
+description = "Rustica Compositor - Wayland compositor built with Smithay"
+
+[dependencies]
+# Smithay - Wayland compositor framework
+smithay = { version = "0.18", features = [
+    "use_system_lib",     # Use system libraries for EGL, libinput, etc.
+    "backend_drm",        # DRM/KMS backend for hardware rendering
+    "backend_libinput",   # libinput for input handling
+    "backend_udev",       # udev for device discovery
+    "renderer_gl",        # OpenGL/EGL renderer
+    "renderer_pixman",    # Software rendering fallback
+] }
+
+# Wayland protocols
+wayland-server = "0.31"
+wayland-sys = "0.31"
+
+# Rendering
+gl = "0.14"
+eglow = "0.6"
+
+# Input
+libinput = "0.8"
+
+# DRM/KMS
+drm = "0.12"
+gbm = "0.13"
+
+# Utilities
+serde = { version = "1.0", features = ["derive"] }
+toml = "0.8"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+anyhow = "1.0"
+thiserror = "1.0"
+
+# Async (for AT-SPI, IME)
+tokio = { version = "1.35", features = ["full"] }
+async-trait = "0.1"
+
+# librustica libraries (will be created in later phases)
+# librustica = { path = "../libs/librustica" }
+# librustica-accessibility = { path = "../libs/librustica-accessibility" }
+# librustica-ime = { path = "../libs/librustica-ime" }
+# librustica-scaling = { path = "../libs/librustica-scaling" }
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+
+[[bin]]
+name = "rustica-comp"
+path = "src/main.rs"

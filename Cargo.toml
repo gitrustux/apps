@@ -2,31 +2,52 @@
 resolver = "2"
 members = [
     # CLI Applications
-    "cli/redit",
-    "cli/net-tools",
-    "cli/sys-tools",
-
-    # GUI Applications
-    "gui/aurora-shell",
-    "gui/aurora-panel",
-    "gui/aurora-launcher",
+    "cli/rpg",
+    "cli/pkg-compat",
+    "cli/svc",
+    "cli/ip",
+    "cli/login",
+    "cli/ping",
+    "cli/fwctl",
+    "cli/installer",
+    "cli/tar",
+    "cli/dnslookup",
+    "cli/editor",
+    "cli/ssh",
+    "cli/logview",
+    "cli/apt",
+    "cli/apt-get",
+    "cli/capctl",
+    "cli/sbctl",
+    "cli/bootctl",
 
     # Shared Libraries
     "libs/rutils",
-    "libs/rgui",
     "libs/netlib",
+
+    # GUI Applications
+    "gui/rustica-web",
 ]
 
 [workspace.package]
-version = "0.1.0"
-edition = "2024"
+version = "0.0.1"
+edition = "2021"
 license = "MIT"
 authors = ["The Rustux Authors"]
 homepage = "https://rustux.com"
-repository = "https://github.com/gitrustux/apps"
+repository = "https://github.com/gitrustux/rustica"
 
 [workspace.dependencies]
-# Common dependencies can be specified here
-# rutils = { path = "libs/rutils" }
-# rgui = { path = "libs/rgui" }
-# netlib = { path = "libs/netlib" }
+anyhow = "1.0"
+thiserror = "1.0"
+clap = { version = "4.4", features = ["derive"] }
+log = "0.4"
+tokio = { version = "1.35", features = ["full"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+reqwest = { version = "0.11", features = ["json"] }
+sha2 = "0.10"
+hex = "0.4"
+nix = "0.27"
+libc = "0.2"
+dirs = "5.0"

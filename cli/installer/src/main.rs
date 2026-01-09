@@ -108,6 +108,17 @@ enum NetworkConfig {
     Static { ip: String, gateway: String, dns: String },
 }
 
+/// Installer mode
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum InstallerMode {
+    /// Install OS to target device
+    Install,
+    /// Create live USB that boots directly to OS
+    LiveUsb,
+    /// Create bootable installer USB
+    InstallerUsb,
+}
+
 /// Main installation function
 fn main() -> Result<()> {
     let args = Args::parse();
@@ -126,33 +137,81 @@ fn main() -> Result<()> {
         std::process::exit(1);
     }
 
-    // Handle USB creation mode
+    // Handle USB creation mode from command line
     if args.create_usb {
-        create_bootable_usb(args)?;
+        create_bootable_usb(args, InstallerMode::InstallerUsb)?;
         return Ok(());
     }
 
-    let config = if args.auto {
-        run_auto_install(args)?
-    } else if let Some(config_path) = args.config {
-        load_config_from_file(&config_path)?
+    // Determine mode
+    let mode = if args.auto {
+        InstallerMode::Install
+    } else if args.config.is_some() {
+        InstallerMode::Install
     } else {
-        run_interactive_install(args)?
+        // Show mode selection menu
+        select_mode()?
     };
 
-    // Perform installation
-    perform_installation(&config)?;
+    match mode {
+        InstallerMode::Install => {
+            let config = if args.auto {
+                run_auto_install(args)?
+            } else if let Some(ref config_path) = args.config {
+                load_config_from_file(config_path)?
+            } else {
+                run_interactive_install(args)?
+            };
 
-    println!();
-    println!("╔═══════════════════════════════════════════════════════════╗");
-    println!("║                                                           ║");
-    println!("║           Installation completed successfully!            ║");
-    println!("║                                                           ║");
-    println!("║           Remove installation media and reboot.           ║");
-    println!("║                                                           ║");
-    println!("╚═══════════════════════════════════════════════════════════╝");
+            // Perform installation
+            perform_installation(&config)?;
+
+            println!();
+            println!("╔═══════════════════════════════════════════════════════════╗");
+            println!("║                                                           ║");
+            println!("║           Installation completed successfully!            ║");
+            println!("║                                                           ║");
+            println!("║           Remove installation media and reboot.           ║");
+            println!("║                                                           ║");
+            println!("╚═══════════════════════════════════════════════════════════╝");
+        }
+        InstallerMode::LiveUsb => {
+            create_bootable_usb(args, InstallerMode::LiveUsb)?;
+        }
+        InstallerMode::InstallerUsb => {
+            create_bootable_usb(args, InstallerMode::InstallerUsb)?;
+        }
+    }
 
     Ok(())
+}
+
+/// Select installer mode
+fn select_mode() -> Result<InstallerMode> {
+    println!("What would you like to do?");
+    println!();
+    println!("  [1] Install Rustica OS to a device");
+    println!("      - Install Rustica OS to a hard drive or SSD");
+    println!("      - All data on the target device will be erased");
+    println!();
+    println!("  [2] Create a Live USB");
+    println!("      - Create a bootable USB that runs Rustica OS directly");
+    println!("      - No installation required, runs entirely from USB");
+    println!("      - Changes are not saved (unless you add persistence)");
+    println!();
+    println!("  [3] Create an Installer USB");
+    println!("      - Create a bootable USB with the installer");
+    println!("      - Use this USB to install Rustica OS on other machines");
+    println!();
+
+    let choice = prompt_choice("Select option", 1..=3)?;
+
+    Ok(match choice {
+        1 => InstallerMode::Install,
+        2 => InstallerMode::LiveUsb,
+        3 => InstallerMode::InstallerUsb,
+        _ => InstallerMode::Install,
+    })
 }
 
 /// Check if running as root
@@ -1450,22 +1509,42 @@ fn get_partition_uuid(partition: &str) -> Result<String> {
 /// ============================================================================
 
 /// Create a bootable USB drive
-fn create_bootable_usb(args: Args) -> Result<()> {
+fn create_bootable_usb(args: Args, mode: InstallerMode) -> Result<()> {
+    let mode_name = match mode {
+        InstallerMode::LiveUsb => "Live USB",
+        InstallerMode::InstallerUsb => "Installer USB",
+        _ => "Bootable USB",
+    };
+
     println!();
     println!("╔═══════════════════════════════════════════════════════════╗");
     println!("║                                                           ║");
-    println!("║              Bootable USB Creation Mode                  ║");
+    println!("║              {} Creation Mode                 ║", mode_name);
     println!("║                                                           ║");
     println!("╚═══════════════════════════════════════════════════════════╝");
     println!();
 
-    // Get ISO path
-    let iso_path = if let Some(iso) = args.iso {
-        iso
+    // For Live USB, we don't need an ISO - we'll build the live image directly
+    let iso_path = if mode == InstallerMode::LiveUsb {
+        // Live USB mode - use pre-built live image or build it
+        let live_image_path = PathBuf::from("/var/www/rustux.com/html/rustica/rustica-live.iso");
+        if !live_image_path.exists() {
+            println!("Live USB image not found.");
+            println!("The live image will be created during the build process.");
+            println!("Please run the complete image build first.");
+            anyhow::bail!("Live USB image not found at: {}", live_image_path.display());
+        }
+        println!("Using live USB image: {}", live_image_path.display());
+        live_image_path
     } else {
-        // Prompt for ISO path
-        let iso_str = prompt_input("Path to ISO image", None)?;
-        PathBuf::from(iso_str)
+        // Installer USB mode - get ISO path
+        if let Some(iso) = args.iso {
+            iso
+        } else {
+            // Prompt for ISO path
+            let iso_str = prompt_input("Path to ISO image", None)?;
+            PathBuf::from(iso_str)
+        }
     };
 
     // Verify ISO exists

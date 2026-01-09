@@ -46,6 +46,14 @@ struct Args {
     /// Skip confirmation prompts
     #[arg(short, long)]
     yes: bool,
+
+    /// Create bootable USB from ISO image
+    #[arg(long)]
+    create_usb: bool,
+
+    /// ISO image path for USB creation
+    #[arg(long)]
+    iso: Option<PathBuf>,
 }
 
 /// Installer configuration
@@ -116,6 +124,12 @@ fn main() -> Result<()> {
         eprintln!("ERROR: This installer must be run as root.");
         eprintln!("Please run: sudo rustux-install");
         std::process::exit(1);
+    }
+
+    // Handle USB creation mode
+    if args.create_usb {
+        create_bootable_usb(args)?;
+        return Ok(());
     }
 
     let config = if args.auto {
@@ -237,12 +251,53 @@ fn run_interactive_install(args: Args) -> Result<InstallerConfig> {
     }
 
     println!("Available devices:");
+    println!();
     for (i, dev) in devices.iter().enumerate() {
-        println!("  {}. {} ({} GB)", i + 1, dev.device, dev.size_gb);
+        println!("  [{}] {}", i + 1, dev.device);
+        println!("      Size: {:.1} GB", dev.size_gb);
+        if !dev.vendor.is_empty() {
+            println!("      Vendor: {}", dev.vendor);
+        }
+        if dev.model != "Unknown" {
+            println!("      Model: {}", dev.model);
+        }
+        println!("      Transport: {}", dev.transport);
+        if dev.is_removable {
+            println!("      Removable: Yes");
+        }
+        if dev.is_boot_device {
+            println!("      ⚠️  WARNING: This is the current boot device!");
+        }
+        if !dev.partitions.is_empty() {
+            println!("      Partitions:");
+            for part in &dev.partitions {
+                println!("        - {} ({:.1} GB){}",
+                    part.partition,
+                    part.size_gb,
+                    part.filesystem.as_ref().map(|fs| format!(" [{}]", fs)).unwrap_or_default()
+                );
+            }
+        }
+        println!();
     }
 
     let device_idx = prompt_choice("Select target device", 1..=devices.len())?;
-    let device = devices[device_idx - 1].device.clone();
+    let selected_device = &devices[device_idx - 1];
+
+    // Warn if selecting boot device
+    if selected_device.is_boot_device {
+        println!();
+        println!("⚠️  WARNING: You have selected the current boot device!");
+        println!("   This will make your system unbootable!");
+        if !args.yes {
+            let confirm = prompt_yes_no("Are you sure you want to continue?")?;
+            if !confirm {
+                anyhow::bail!("Installation cancelled by user.");
+            }
+        }
+    }
+
+    let device = selected_device.device.clone();
 
     // Confirm destructive action
     println!();
@@ -357,11 +412,30 @@ fn run_interactive_install(args: Args) -> Result<InstallerConfig> {
 struct BlockDevice {
     device: String,
     size_gb: f64,
+    model: String,
+    vendor: String,
+    transport: String,
+    is_removable: bool,
+    partitions: Vec<PartitionInfo>,
+    is_boot_device: bool,
+}
+
+/// Partition information
+#[derive(Debug, Clone)]
+struct PartitionInfo {
+    partition: String,
+    size_gb: f64,
+    #[allow(dead_code)]
+    label: Option<String>,
+    filesystem: Option<String>,
 }
 
 /// List available block devices
 fn list_block_devices() -> Result<Vec<BlockDevice>> {
     let mut devices = Vec::new();
+
+    // Get current boot device to mark it
+    let boot_device = get_boot_device();
 
     // Read from /sys/block
     let sys_block = Path::new("/sys/block");
@@ -372,7 +446,7 @@ fn list_block_devices() -> Result<Vec<BlockDevice>> {
             let name_str = name.to_string_lossy();
 
             // Skip loop devices and other special devices
-            if name_str.starts_with("loop") || name_str.starts_with("ram") {
+            if name_str.starts_with("loop") || name_str.starts_with("ram") || name_str.starts_with("sr") {
                 continue;
             }
 
@@ -383,21 +457,173 @@ fn list_block_devices() -> Result<Vec<BlockDevice>> {
 
             // Get size
             let size_path = entry.path().join("size");
-            if let Ok(size_str) = fs::read_to_string(size_path) {
+            let (size_gb, _size_bytes) = if let Ok(size_str) = fs::read_to_string(&size_path) {
                 if let Ok(sector_count) = size_str.trim().parse::<u64>() {
-                    let size_bytes = sector_count * 512;
-                    let size_gb = size_bytes as f64 / (1024.0 * 1024.0 * 1024.0);
+                    let bytes = sector_count * 512;
+                    let gb = bytes as f64 / (1024.0 * 1024.0 * 1024.0);
+                    (gb, bytes)
+                } else {
+                    continue;
+                }
+            } else {
+                continue;
+            };
 
-                    devices.push(BlockDevice {
-                        device: format!("/dev/{}", name_str),
-                        size_gb,
-                    });
+            // Skip very small devices (< 1GB)
+            if size_gb < 1.0 {
+                continue;
+            }
+
+            // Get device model and vendor
+            let model_path = entry.path().join("device/model");
+            let vendor_path = entry.path().join("device/vendor");
+            let model = fs::read_to_string(&model_path)
+                .ok()
+                .map(|s| s.trim().to_string())
+                .unwrap_or_else(|| "Unknown".to_string());
+            let vendor = fs::read_to_string(&vendor_path)
+                .ok()
+                .map(|s| s.trim().to_string())
+                .unwrap_or_else(|| String::new());
+
+            // Get transport type (SATA, NVMe, etc.)
+            let transport = if name_str.starts_with("nvme") {
+                "NVMe".to_string()
+            } else if name_str.starts_with("mmc") {
+                "eMMC".to_string()
+            } else {
+                // Check if it's SATA or USB via /sys/block/<device>/device/transport
+                let transport_path = entry.path().join("device/transport");
+                fs::read_to_string(&transport_path)
+                    .ok()
+                    .map(|s| s.trim().to_string())
+                    .unwrap_or_else(|| "SATA".to_string())
+            };
+
+            // Check if removable
+            let removable_path = entry.path().join("removable");
+            let is_removable = fs::read_to_string(&removable_path)
+                .ok()
+                .map(|s| s.trim() == "1")
+                .unwrap_or(false);
+
+            // Get partition information
+            let partitions = get_partitions(&device_path)?;
+
+            // Check if this is the boot device
+            let is_boot_device = boot_device.as_ref()
+                .map(|bd| bd == &name_str || device_path.starts_with(bd))
+                .unwrap_or(false);
+
+            devices.push(BlockDevice {
+                device: format!("/dev/{}", name_str),
+                size_gb,
+                model,
+                vendor,
+                transport,
+                is_removable,
+                partitions,
+                is_boot_device,
+            });
+        }
+    }
+
+    Ok(devices)
+}
+
+/// Get partition information for a device
+fn get_partitions(device_path: &Path) -> Result<Vec<PartitionInfo>> {
+    let mut partitions = Vec::new();
+
+    let device_name = device_path.file_name()
+        .and_then(|n| n.to_str())
+        .unwrap_or("");
+
+    // Read /sys/block/<device>/<device>* directories
+    let sys_block = Path::new("/sys/block").join(device_name);
+
+    if let Ok(entries) = fs::read_dir(&sys_block) {
+        for entry in entries.flatten() {
+            let part_name = entry.file_name().to_string_lossy().to_string();
+
+            // Only look at partition directories
+            if !part_name.starts_with(device_name) || part_name == device_name {
+                continue;
+            }
+
+            let part_path = Path::new("/dev").join(&part_name);
+            if !part_path.exists() {
+                continue;
+            }
+
+            // Get partition size
+            let size_path = entry.path().join("size");
+            let size_gb = if let Ok(size_str) = fs::read_to_string(&size_path) {
+                if let Ok(sector_count) = size_str.trim().parse::<u64>() {
+                    let bytes = sector_count * 512;
+                    bytes as f64 / (1024.0 * 1024.0 * 1024.0)
+                } else {
+                    0.0
+                }
+            } else {
+                0.0
+            };
+
+            // Try to get filesystem info using lsblk
+            let filesystem = get_filesystem_type(&part_path).ok();
+
+            partitions.push(PartitionInfo {
+                partition: part_path.display().to_string(),
+                size_gb,
+                label: None, // Could be enhanced with blkid
+                filesystem,
+            });
+        }
+    }
+
+    Ok(partitions)
+}
+
+/// Get filesystem type for a partition
+fn get_filesystem_type(partition: &Path) -> Result<String> {
+    let output = Command::new("blkid")
+        .arg("-o")
+        .arg("value")
+        .arg("-s")
+        .arg("TYPE")
+        .arg(partition)
+        .output()?;
+
+    if output.status.success() {
+        let fs_type = String::from_utf8_lossy(&output.stdout).trim().to_string();
+        if !fs_type.is_empty() {
+            return Ok(fs_type);
+        }
+    }
+
+    // Fallback: try reading from /etc/mtab
+    Ok("unknown".to_string())
+}
+
+/// Get the current boot device
+fn get_boot_device() -> Option<String> {
+    // Try to get boot device from /proc/mounts
+    if let Ok(mounts) = fs::read_to_string("/proc/mounts") {
+        for line in mounts.lines() {
+            let parts: Vec<&str> = line.split_whitespace().collect();
+            if parts.len() >= 2 && (parts[1] == "/" || parts[1].starts_with("/boot")) {
+                let boot_dev = Path::new(parts[0]);
+                if let Some(name) = boot_dev.file_name() {
+                    // Get the base device (e.g., sda from sda2)
+                    let name_str = name.to_string_lossy();
+                    let base_name = name_str.trim_end_matches(|c: char| c.is_ascii_digit());
+                    return Some(base_name.to_string());
                 }
             }
         }
     }
 
-    Ok(devices)
+    None
 }
 
 /// Detect system architecture
@@ -1217,4 +1443,199 @@ fn get_partition_uuid(partition: &str) -> Result<String> {
     }
 
     Ok(uuid)
+}
+
+/// ============================================================================
+/// Bootable USB Creation
+/// ============================================================================
+
+/// Create a bootable USB drive
+fn create_bootable_usb(args: Args) -> Result<()> {
+    println!();
+    println!("╔═══════════════════════════════════════════════════════════╗");
+    println!("║                                                           ║");
+    println!("║              Bootable USB Creation Mode                  ║");
+    println!("║                                                           ║");
+    println!("╚═══════════════════════════════════════════════════════════╝");
+    println!();
+
+    // Get ISO path
+    let iso_path = if let Some(iso) = args.iso {
+        iso
+    } else {
+        // Prompt for ISO path
+        let iso_str = prompt_input("Path to ISO image", None)?;
+        PathBuf::from(iso_str)
+    };
+
+    // Verify ISO exists
+    if !iso_path.exists() {
+        anyhow::bail!("ISO file not found: {}", iso_path.display());
+    }
+
+    println!("Found ISO: {}", iso_path.display());
+
+    // Get ISO size
+    let iso_size = fs::metadata(&iso_path)?.len();
+    let iso_size_gb = iso_size as f64 / (1024.0 * 1024.0 * 1024.0);
+    println!("ISO size: {:.1} GB", iso_size_gb);
+
+    // Scan for USB devices
+    println!();
+    println!("Scanning for USB devices...");
+    let devices = list_block_devices()?;
+
+    // Filter for removable devices or devices that look like USBs
+    let usb_devices: Vec<_> = devices.iter()
+        .filter(|d| d.is_removable || d.transport == "USB")
+        .collect();
+
+    if usb_devices.is_empty() {
+        // Allow showing all devices if no removable ones found
+        println!("No removable USB devices found.");
+        println!("Showing all available devices:");
+        println!();
+
+        for (i, dev) in devices.iter().enumerate() {
+            println!("  [{}] {} ({:.1} GB - {})", i + 1, dev.device, dev.size_gb, dev.transport);
+            if dev.is_boot_device {
+                println!("      ⚠️  This is the current boot device!");
+            }
+            if !dev.partitions.is_empty() {
+                println!("      Partitions: {}", dev.partitions.len());
+            }
+            println!();
+        }
+    } else {
+        println!("Found {} USB device(s):", usb_devices.len());
+        println!();
+
+        for (i, dev) in usb_devices.iter().enumerate() {
+            println!("  [{}] {} ({:.1} GB - {})", i + 1, dev.device, dev.size_gb, dev.model);
+            if dev.is_boot_device {
+                println!("      ⚠️  This is the current boot device!");
+            }
+            if !dev.partitions.is_empty() {
+                println!("      Partitions: {}", dev.partitions.len());
+                for part in &dev.partitions {
+                    println!("        - {}", part.partition);
+                }
+            }
+            println!();
+        }
+
+        println!("  [0] Show all devices");
+        println!();
+    }
+
+    // Select device
+    let device_idx = if usb_devices.is_empty() {
+        prompt_choice("Select target USB device", 1..=devices.len())?
+    } else {
+        let choice = prompt_choice("Select target USB device", 0..=usb_devices.len())?;
+        if choice == 0 {
+            // Show all devices
+            println!();
+            for (i, dev) in devices.iter().enumerate() {
+                println!("  [{}] {} ({:.1} GB - {})", i + 1, dev.device, dev.size_gb, dev.transport);
+            }
+            prompt_choice("Select target device", 1..=devices.len())?
+        } else {
+            choice
+        }
+    };
+
+    let target_device = if usb_devices.is_empty() {
+        &devices[device_idx - 1]
+    } else {
+        usb_devices[device_idx - 1]
+    };
+
+    println!();
+    println!("Selected device: {}", target_device.device);
+    println!("Device size: {:.1} GB", target_device.size_gb);
+    println!("ISO size: {:.1} GB", iso_size_gb);
+
+    // Warn if ISO is larger than device
+    if iso_size_gb > target_device.size_gb {
+        eprintln!();
+        eprintln!("ERROR: ISO ({:.1} GB) is larger than target device ({:.1} GB)!",
+                  iso_size_gb, target_device.size_gb);
+        anyhow::bail!("ISO image is too large for target device");
+    }
+
+    // Warn if boot device
+    if target_device.is_boot_device {
+        println!();
+        println!("⚠️  WARNING: This appears to be the current boot device!");
+    }
+
+    // Show partitions that will be erased
+    if !target_device.partitions.is_empty() {
+        println!();
+        println!("This will erase the following partitions:");
+        for part in &target_device.partitions {
+            println!("  - {}", part.partition);
+        }
+    }
+
+    // Confirm
+    println!();
+    if !args.yes {
+        let confirm = prompt_yes_no("This will ERASE ALL DATA on the USB device. Continue?")?;
+        if !confirm {
+            anyhow::bail!("USB creation cancelled by user.");
+        }
+    }
+
+    // Unmount any mounted partitions
+    println!();
+    println!("Unmounting any mounted partitions...");
+    for part in &target_device.partitions {
+        let _ = Command::new("umount")
+            .arg(&part.partition)
+            .status();
+    }
+
+    // Write ISO to USB
+    println!();
+    println!("Writing ISO to USB device...");
+    println!("This may take a while...");
+
+    let write_result = if cfg!(target_os = "linux") {
+        // Use dd on Linux
+        Command::new("dd")
+            .arg("if=".to_string() + iso_path.to_str().unwrap())
+            .arg("of=".to_string() + &target_device.device)
+            .arg("bs=4M")
+            .arg("status=progress")
+            .arg("conv=fdatasync")
+            .status()
+            .context("Failed to write ISO with dd")?
+    } else {
+        // Try using dd with different options on non-Linux
+        Command::new("dd")
+            .arg("if=".to_string() + iso_path.to_str().unwrap())
+            .arg("of=".to_string() + &target_device.device)
+            .arg("bs=4m")
+            .status()
+            .context("Failed to write ISO with dd")?
+    };
+
+    if !write_result.success() {
+        anyhow::bail!("Failed to write ISO to USB device");
+    }
+
+    // Sync to ensure data is written
+    println!("Syncing data to device...");
+    let _ = Command::new("sync")
+        .status();
+
+    // Eject the device if possible
+    println!();
+    println!("USB creation completed successfully!");
+    println!();
+    println!("You can now remove the USB drive and use it to boot Rustica OS.");
+
+    Ok(())
 }

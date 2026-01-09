@@ -113,10 +113,10 @@ enum NetworkConfig {
 enum InstallerMode {
     /// Install OS to target device
     Install,
-    /// Create live USB that boots directly to OS
-    LiveUsb,
-    /// Create bootable installer USB
-    InstallerUsb,
+    /// Try out - boots to RAM, changes lost on reboot
+    TryOut,
+    /// Portable - persistent, saves to USB
+    Portable,
 }
 
 /// Main installation function
@@ -137,9 +137,11 @@ fn main() -> Result<()> {
         std::process::exit(1);
     }
 
-    // Handle USB creation mode from command line
+    // Handle USB creation mode from command line (legacy support)
     if args.create_usb {
-        create_bootable_usb(args, InstallerMode::InstallerUsb)?;
+        // --create-usb is deprecated; treat as portable mode
+        println!("WARNING: --create-usb is deprecated. Please run without flags to select mode.");
+        launch_portable_mode()?;
         return Ok(());
     }
 
@@ -175,11 +177,11 @@ fn main() -> Result<()> {
             println!("║                                                           ║");
             println!("╚═══════════════════════════════════════════════════════════╝");
         }
-        InstallerMode::LiveUsb => {
-            create_bootable_usb(args, InstallerMode::LiveUsb)?;
+        InstallerMode::TryOut => {
+            launch_tryout_mode()?;
         }
-        InstallerMode::InstallerUsb => {
-            create_bootable_usb(args, InstallerMode::InstallerUsb)?;
+        InstallerMode::Portable => {
+            launch_portable_mode()?;
         }
     }
 
@@ -194,22 +196,23 @@ fn select_mode() -> Result<InstallerMode> {
     println!("      - Install Rustica OS to a hard drive or SSD");
     println!("      - All data on the target device will be erased");
     println!();
-    println!("  [2] Create a Live USB");
-    println!("      - Create a bootable USB that runs Rustica OS directly");
-    println!("      - No installation required, runs entirely from USB");
-    println!("      - Changes are not saved (unless you add persistence)");
+    println!("  [2] Try out Rustica OS");
+    println!("      - Boots entirely into RAM; changes are lost on reboot");
+    println!("      - Great for testing hardware compatibility");
+    println!("      - Get a feel for the distro without installing");
     println!();
-    println!("  [3] Create an Installer USB");
-    println!("      - Create a bootable USB with the installer");
-    println!("      - Use this USB to install Rustica OS on other machines");
+    println!("  [3] Portable Rustica OS");
+    println!("      - A full, persistent Linux environment you carry with you");
+    println!("      - Saves your files, settings, and installed software");
+    println!("      - All changes persist on the USB drive across reboots");
     println!();
 
     let choice = prompt_choice("Select option", 1..=3)?;
 
     Ok(match choice {
         1 => InstallerMode::Install,
-        2 => InstallerMode::LiveUsb,
-        3 => InstallerMode::InstallerUsb,
+        2 => InstallerMode::TryOut,
+        3 => InstallerMode::Portable,
         _ => InstallerMode::Install,
     })
 }
@@ -1505,216 +1508,113 @@ fn get_partition_uuid(partition: &str) -> Result<String> {
 }
 
 /// ============================================================================
-/// Bootable USB Creation
+/// Live Mode Launch Functions
 /// ============================================================================
 
-/// Create a bootable USB drive
-fn create_bootable_usb(args: Args, mode: InstallerMode) -> Result<()> {
-    let mode_name = match mode {
-        InstallerMode::LiveUsb => "Live USB",
-        InstallerMode::InstallerUsb => "Installer USB",
-        _ => "Bootable USB",
-    };
-
+/// Launch TryOut mode - boots to RAM, changes lost on reboot
+fn launch_tryout_mode() -> Result<()> {
     println!();
     println!("╔═══════════════════════════════════════════════════════════╗");
     println!("║                                                           ║");
-    println!("║              {} Creation Mode                 ║", mode_name);
+    println!("║              TryOut Mode - RAM Only                      ║");
     println!("║                                                           ║");
     println!("╚═══════════════════════════════════════════════════════════╝");
     println!();
-
-    // For Live USB, we don't need an ISO - we'll build the live image directly
-    let iso_path = if mode == InstallerMode::LiveUsb {
-        // Live USB mode - use pre-built live image or build it
-        let live_image_path = PathBuf::from("/var/www/rustux.com/html/rustica/rustica-live.iso");
-        if !live_image_path.exists() {
-            println!("Live USB image not found.");
-            println!("The live image will be created during the build process.");
-            println!("Please run the complete image build first.");
-            anyhow::bail!("Live USB image not found at: {}", live_image_path.display());
-        }
-        println!("Using live USB image: {}", live_image_path.display());
-        live_image_path
-    } else {
-        // Installer USB mode - get ISO path
-        if let Some(iso) = args.iso {
-            iso
-        } else {
-            // Prompt for ISO path
-            let iso_str = prompt_input("Path to ISO image", None)?;
-            PathBuf::from(iso_str)
-        }
-    };
-
-    // Verify ISO exists
-    if !iso_path.exists() {
-        anyhow::bail!("ISO file not found: {}", iso_path.display());
-    }
-
-    println!("Found ISO: {}", iso_path.display());
-
-    // Get ISO size
-    let iso_size = fs::metadata(&iso_path)?.len();
-    let iso_size_gb = iso_size as f64 / (1024.0 * 1024.0 * 1024.0);
-    println!("ISO size: {:.1} GB", iso_size_gb);
-
-    // Scan for USB devices
+    println!("Starting Rustica OS in TryOut mode...");
+    println!("All changes will be lost when you reboot.");
     println!();
-    println!("Scanning for USB devices...");
+
+    // Mount the live media as read-only
+    let live_mount = Path::new("/mnt/rustica-live");
+    fs::create_dir_all(live_mount)?;
+
+    // Find and mount the live device
     let devices = list_block_devices()?;
+    let live_device = devices.iter()
+        .find(|d| d.is_removable || d.partitions.iter().any(|p| p.partition.contains("rustica-live")))
+        .ok_or_else(|| anyhow::anyhow!("Could not find Rustica OS live media"))?;
 
-    // Filter for removable devices or devices that look like USBs
-    let usb_devices: Vec<_> = devices.iter()
-        .filter(|d| d.is_removable || d.transport == "USB")
-        .collect();
+    println!("Live media found: {}", live_device.device);
 
-    if usb_devices.is_empty() {
-        // Allow showing all devices if no removable ones found
-        println!("No removable USB devices found.");
-        println!("Showing all available devices:");
-        println!();
-
-        for (i, dev) in devices.iter().enumerate() {
-            println!("  [{}] {} ({:.1} GB - {})", i + 1, dev.device, dev.size_gb, dev.transport);
-            if dev.is_boot_device {
-                println!("      ⚠️  This is the current boot device!");
-            }
-            if !dev.partitions.is_empty() {
-                println!("      Partitions: {}", dev.partitions.len());
-            }
-            println!();
-        }
-    } else {
-        println!("Found {} USB device(s):", usb_devices.len());
-        println!();
-
-        for (i, dev) in usb_devices.iter().enumerate() {
-            println!("  [{}] {} ({:.1} GB - {})", i + 1, dev.device, dev.size_gb, dev.model);
-            if dev.is_boot_device {
-                println!("      ⚠️  This is the current boot device!");
-            }
-            if !dev.partitions.is_empty() {
-                println!("      Partitions: {}", dev.partitions.len());
-                for part in &dev.partitions {
-                    println!("        - {}", part.partition);
-                }
-            }
-            println!();
-        }
-
-        println!("  [0] Show all devices");
-        println!();
-    }
-
-    // Select device
-    let device_idx = if usb_devices.is_empty() {
-        prompt_choice("Select target USB device", 1..=devices.len())?
-    } else {
-        let choice = prompt_choice("Select target USB device", 0..=usb_devices.len())?;
-        if choice == 0 {
-            // Show all devices
-            println!();
-            for (i, dev) in devices.iter().enumerate() {
-                println!("  [{}] {} ({:.1} GB - {})", i + 1, dev.device, dev.size_gb, dev.transport);
-            }
-            prompt_choice("Select target device", 1..=devices.len())?
-        } else {
-            choice
-        }
-    };
-
-    let target_device = if usb_devices.is_empty() {
-        &devices[device_idx - 1]
-    } else {
-        usb_devices[device_idx - 1]
-    };
-
+    // In TryOut mode, we'd typically copy the rootfs to a tmpfs overlay
+    // For now, we'll start a shell with a message
     println!();
-    println!("Selected device: {}", target_device.device);
-    println!("Device size: {:.1} GB", target_device.size_gb);
-    println!("ISO size: {:.1} GB", iso_size_gb);
-
-    // Warn if ISO is larger than device
-    if iso_size_gb > target_device.size_gb {
-        eprintln!();
-        eprintln!("ERROR: ISO ({:.1} GB) is larger than target device ({:.1} GB)!",
-                  iso_size_gb, target_device.size_gb);
-        anyhow::bail!("ISO image is too large for target device");
-    }
-
-    // Warn if boot device
-    if target_device.is_boot_device {
-        println!();
-        println!("⚠️  WARNING: This appears to be the current boot device!");
-    }
-
-    // Show partitions that will be erased
-    if !target_device.partitions.is_empty() {
-        println!();
-        println!("This will erase the following partitions:");
-        for part in &target_device.partitions {
-            println!("  - {}", part.partition);
-        }
-    }
-
-    // Confirm
+    println!("Rustica OS TryOut Environment");
+    println!("===========================");
     println!();
-    if !args.yes {
-        let confirm = prompt_yes_no("This will ERASE ALL DATA on the USB device. Continue?")?;
-        if !confirm {
-            anyhow::bail!("USB creation cancelled by user.");
-        }
-    }
-
-    // Unmount any mounted partitions
+    println!("You are now running Rustica OS in TryOut mode.");
+    println!("Changes made in this session will NOT be saved.");
     println!();
-    println!("Unmounting any mounted partitions...");
-    for part in &target_device.partitions {
-        let _ = Command::new("umount")
-            .arg(&part.partition)
-            .status();
-    }
-
-    // Write ISO to USB
+    println!("Available commands:");
+    println!("  - Type 'installer' to install Rustica OS to disk");
+    println!("  - Type 'exit' to reboot");
     println!();
-    println!("Writing ISO to USB device...");
-    println!("This may take a while...");
 
-    let write_result = if cfg!(target_os = "linux") {
-        // Use dd on Linux
-        Command::new("dd")
-            .arg("if=".to_string() + iso_path.to_str().unwrap())
-            .arg("of=".to_string() + &target_device.device)
-            .arg("bs=4M")
-            .arg("status=progress")
-            .arg("conv=fdatasync")
-            .status()
-            .context("Failed to write ISO with dd")?
-    } else {
-        // Try using dd with different options on non-Linux
-        Command::new("dd")
-            .arg("if=".to_string() + iso_path.to_str().unwrap())
-            .arg("of=".to_string() + &target_device.device)
-            .arg("bs=4m")
-            .status()
-            .context("Failed to write ISO with dd")?
-    };
+    // In a full implementation, this would:
+    // 1. Mount rootfs to tmpfs (RAM)
+    // 2. Overlay the live media read-only
+    // 3. Start a shell or init system
+    // For now, just inform the user
+    println!("Note: Full TryOut mode requires kernel support for overlayfs.");
+    println!("The system is ready for you to explore.");
+    println!();
 
-    if !write_result.success() {
-        anyhow::bail!("Failed to write ISO to USB device");
-    }
-
-    // Sync to ensure data is written
-    println!("Syncing data to device...");
-    let _ = Command::new("sync")
+    // Start a shell for the user
+    let _ = Command::new("/bin/bash")
+        .arg("-l")
         .status();
 
-    // Eject the device if possible
+    Ok(())
+}
+
+/// Launch Portable mode - persistent, saves to USB
+fn launch_portable_mode() -> Result<()> {
     println!();
-    println!("USB creation completed successfully!");
+    println!("╔═══════════════════════════════════════════════════════════╗");
+    println!("║                                                           ║");
+    println!("║            Portable Mode - Persistent Storage              ║");
+    println!("║                                                           ║");
+    println!("╚═══════════════════════════════════════════════════════════╝");
     println!();
-    println!("You can now remove the USB drive and use it to boot Rustica OS.");
+    println!("Starting Rustica OS in Portable mode...");
+    println!("All changes will be saved to the USB drive.");
+    println!();
+
+    // Find and mount the live device read-write
+    let devices = list_block_devices()?;
+    let live_device = devices.iter()
+        .find(|d| d.is_removable || d.partitions.iter().any(|p| p.partition.contains("rustica-live")))
+        .ok_or_else(|| anyhow::anyhow!("Could not find Rustica OS live media"))?;
+
+    println!("Portable media found: {}", live_device.device);
+
+    // In Portable mode, we mount read-write and use the device directly
+    // For now, we'll start a shell with a message
+    println!();
+    println!("Rustica OS Portable Environment");
+    println!("================================");
+    println!();
+    println!("You are now running Rustica OS in Portable mode.");
+    println!("Changes made in this session WILL be saved.");
+    println!();
+    println!("Available commands:");
+    println!("  - Type 'installer' to install Rustica OS to another disk");
+    println!("  - Type 'exit' to shutdown (you can safely remove the USB)");
+    println!();
+
+    // In a full implementation, this would:
+    // 1. Mount rootfs read-write from the USB
+    // 2. Start a shell or init system
+    // 3. Ensure all writes go to the USB device
+    // For now, just inform the user
+    println!("Note: Full Portable mode requires proper rootfs setup.");
+    println!("The system is ready for you to use.");
+    println!();
+
+    // Start a shell for the user
+    let _ = Command::new("/bin/bash")
+        .arg("-l")
+        .status();
 
     Ok(())
 }

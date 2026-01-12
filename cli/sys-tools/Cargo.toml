@@ -1,0 +1,37 @@
+[package]
+name = "sys-tools"
+version = "0.0.1"
+edition = "2021"
+
+[[bin]]
+name = "sys-tools"
+path = "src/main.rs"
+
+[[bin]]
+name = "uname"
+path = "src/bin/uname.rs"
+
+[[bin]]
+name = "hostname"
+path = "src/bin/hostname.rs"
+
+[[bin]]
+name = "lsb_release"
+path = "src/bin/lsb_release.rs"
+
+[[bin]]
+name = "free"
+path = "src/bin/free.rs"
+
+[[bin]]
+name = "df"
+path = "src/bin/df.rs"
+
+[dependencies]
+anyhow.workspace = true
+thiserror.workspace = true
+clap.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+rutils = { path = "../../libs/rutils" }
+nix = { workspace = true, features = ["fs", "mount"] }

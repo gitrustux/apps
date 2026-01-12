@@ -1,0 +1,34 @@
+[package]
+name = "file-tools"
+version = "0.0.1"
+edition = "2021"
+
+[[bin]]
+name = "file-tools"
+path = "src/main.rs"
+
+[[bin]]
+name = "ls"
+path = "src/bin/ls.rs"
+
+[[bin]]
+name = "cat"
+path = "src/bin/cat.rs"
+
+[[bin]]
+name = "echo"
+path = "src/bin/echo.rs"
+
+[[bin]]
+name = "pwd"
+path = "src/bin/pwd.rs"
+
+[dependencies]
+anyhow.workspace = true
+thiserror.workspace = true
+clap.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+rutils = { path = "../../libs/rutils" }
+nix = { workspace = true, features = ["fs", "user"] }
+chrono = { workspace = true }

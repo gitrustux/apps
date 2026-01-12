@@ -20,6 +20,9 @@ members = [
     "cli/capctl",
     "cli/sbctl",
     "cli/bootctl",
+    "cli/sys-tools",
+    "cli/pkg-tools",
+    "cli/file-tools",
 
     # Shared Libraries
     "libs/rutils",
@@ -51,3 +54,4 @@ hex = "0.4"
 nix = "0.27"
 libc = "0.2"
 dirs = "5.0"
+chrono = "0.4"

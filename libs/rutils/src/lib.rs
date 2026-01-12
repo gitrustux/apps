@@ -12,6 +12,9 @@ pub mod process;
 pub mod file;
 pub mod auth;
 
+#[cfg(feature = "serde")]
+pub mod sysinfo;
+
 pub use process::{Process, ProcessInfo};
 pub use file::{ensure_dir, safe_write};
 
@@ -19,6 +22,9 @@ pub use file::{ensure_dir, safe_write};
 pub use file::compute_checksum;
 
 pub use auth::{authenticate_user, get_username, get_home_dir, switch_user};
+
+#[cfg(feature = "serde")]
+pub use sysinfo::{SystemInfo, DistributionInfo, CpuInfo};
 
 #[cfg(feature = "serde")]
 pub mod config;

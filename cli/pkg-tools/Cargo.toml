@@ -1,0 +1,36 @@
+[package]
+name = "pkg-tools"
+version = "0.0.1"
+edition = "2021"
+
+[[bin]]
+name = "pkg-tools"
+path = "src/main.rs"
+
+[[bin]]
+name = "app"
+path = "src/bin/app.rs"
+
+[[bin]]
+name = "app-get"
+path = "src/bin/app_get.rs"
+
+[[bin]]
+name = "app-cache"
+path = "src/bin/app_cache.rs"
+
+[[bin]]
+name = "rpg"
+path = "src/bin/rpg.rs"
+
+[[bin]]
+name = "rpg-query"
+path = "src/bin/rpg_query.rs"
+
+[dependencies]
+anyhow.workspace = true
+thiserror.workspace = true
+clap.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+rutils = { path = "../../libs/rutils" }

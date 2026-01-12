@@ -25,6 +25,9 @@ PACKAGES=(
     "rustux-capctl"
     "rustux-sbctl"
     "rustux-bootctl"
+    "sys-tools"
+    "pkg-tools"
+    "file-tools"
 )
 
 echo "======================================"

@@ -1,0 +1,12 @@
+[package]
+name = "rustux-kernel"
+version = "0.2.0"
+edition = "2021"
+authors = ["Rustux Kernel Team"]
+description = "CLI tool for building and testing the Rustux kernel"
+
+[dependencies]
+
+[[bin]]
+name = "rustux-kernel"
+path = "src/main.rs"

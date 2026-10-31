@@ -4,6 +4,18 @@
 
 ---
 
+## Naming Rules
+
+Only the Debian/Ubuntu package tools are renamed; every other command keeps its familiar name (`ls`, `grep`, `ip`, `systemctl`, `tar`, ...).
+
+| Ubuntu | Rustica |
+|--------|---------|
+| `apt`, `apt-get`, `apt-cache`, `apt-key`, `apt-add-repository`, `apt-mark`, `apt-config`, `apt-listchanges` | `app`, `app-get`, `app-cache`, `app-key`, `app-add-repository`, `app-mark`, `app-config`, `app-listchanges` |
+| `aptitude` | `applicate` |
+| `dpkg`, `dpkg-deb`, `dpkg-query`, `dpkg-reconfigure`, `dpkg-divert` | `rpg`, `rpg-deb`, `rpg-query`, `rpg-reconfigure`, `rpg-divert` |
+
+---
+
 ## 1. Package Management (`app` / `rpg`)
 
 ### 1.1 `app` (apt replacement)

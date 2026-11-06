@@ -221,10 +221,10 @@ Only the Debian/Ubuntu package tools are renamed; every other command keeps its 
 | `free` | ✅ | `-h`, `-b`, `-k`, `-m`, `-g`, `--si`, `-t`, `-o`, `-l` | JSON: `--json`. Rustux: C program; `-k`, `-m`, `-g`, `-h`, `--json` |
 | `vmstat` | ⬜ | `-s`, `-d`, `-D`, `-p`, `-S`, `-m`, `-a`, `-t`, `-w` | JSON: `--json` |
 | `iostat` | ⬜ | `-c`, `-d`, `-x`, `-k`, `-m`, `-p`, `-t`, `-z`, `-h` | JSON: `--json` |
-| `lsblk` | ⚠️ | `-a`, `-b`, `-f`, `-m`, `-d`, `-o`, `-O`, `-P`, `-J`, `-p` | JSON: `-J` / `--json`. Rustux: C program (step 12) asking devmgr; `-b`, `-n`, `-J`/`--json` |
-| `lsblk -f` | ⬜ | | Filesystems |
+| `lsblk` | ⚠️ | `-a`, `-b`, `-f`, `-m`, `-d`, `-o`, `-O`, `-P`, `-J`, `-p` | JSON: `-J` / `--json`. Rustux: C program asking devmgr; tree of disks and partitions (step 13); `-b`, `-n`, `-l`, `-d`, `-f`, `-o`, `-J`; no `-a`, `-m`, `-O`, `-P`, `-p` |
+| `lsblk -f` | ✅ | | Filesystems. Rustux: FSTYPE, LABEL, UUID by signature (vfat, exfat, ntfs, BitLocker, ext2/3/4, swap, iso9660) |
 | `lsblk -m` | ⬜ | | Permissions |
-| `blkid` | ⬜ | `-o`, `-p`, `-s`, `-t`, `-u`, `-c`, `-L`, `-U` | JSON: `-o export` / `--json` |
+| `blkid` | ⚠️ | `-o`, `-p`, `-s`, `-t`, `-u`, `-c`, `-L`, `-U` | JSON: `-o export` / `--json`. Rustux: C program (step 13); `-o full/value/export`, `-s`; device names are devmgr's (`vda1`), not `/dev` paths; no `-p`, `-t`, `-L`, `-U` |
 | `df` | ⚠️ | `-h`, `-H`, `-i`, `-k`, `-l`, `-P`, `-T`, `-x`, `-t`, `-a` | JSON: `--output=json`. Rustux: uutils coreutils; GNU text output, no JSON yet; reads `/etc/mtab` (tmpfs, bootfs, devfs) |
 | `du` | ⚠️ | `-h`, `-s`, `-c`, `-a`, `-x`, `-d`, `--max-depth`, `--time` | JSON: `--json`. Rustux: uutils coreutils; GNU text output, no JSON yet |
 | `mount` | ⬜ | `-t`, `-a`, `-o`, `-v`, `-f`, `-l`, `-n`, `--bind`, `--move` | JSON: `--json` |
@@ -403,7 +403,10 @@ Only the Debian/Ubuntu package tools are renamed; every other command keeps its 
 | `mount` | ⬜ | (see System Info) | |
 | `umount` | ⬜ | (see System Info) | |
 | `lsblk` | ⚠️ | (see System Info) | |
-| `blkid` | ⬜ | (see System Info) | |
+| `blkid` | ⚠️ | (see System Info) | |
+| `fdisk` | ⚠️ | `-l` | Rustux: listing only (step 13); tables are changed with `gpt` |
+| `gpt` | ✅ | `show`, `create`, `add`, `remove`, `label`, `type`, `destroy`, `types` | Rustux's GPT tool (step 13), FreeBSD-like |
+| `blk` | ✅ | `read`, `write`, `info`, `rescan`, `flush` | Rustux's: block devices from the shell while they are not in `/dev` (step 13) |
 | `findmnt` | ⬜ | (see System Info) | |
 | `df` | ⚠️ | (see System Info) | Rustux: uutils coreutils; GNU text output, no JSON yet; reads `/etc/mtab` (tmpfs, bootfs, devfs) |
 | `du` | ⚠️ | (see System Info) | Rustux: uutils coreutils; GNU text output, no JSON yet |

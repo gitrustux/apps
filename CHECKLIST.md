@@ -221,7 +221,7 @@ Only the Debian/Ubuntu package tools are renamed; every other command keeps its 
 | `free` | ✅ | `-h`, `-b`, `-k`, `-m`, `-g`, `--si`, `-t`, `-o`, `-l` | JSON: `--json`. Rustux: C program; `-k`, `-m`, `-g`, `-h`, `--json` |
 | `vmstat` | ⬜ | `-s`, `-d`, `-D`, `-p`, `-S`, `-m`, `-a`, `-t`, `-w` | JSON: `--json` |
 | `iostat` | ⬜ | `-c`, `-d`, `-x`, `-k`, `-m`, `-p`, `-t`, `-z`, `-h` | JSON: `--json` |
-| `lsblk` | ⬜ | `-a`, `-b`, `-f`, `-m`, `-d`, `-o`, `-O`, `-P`, `-J`, `-p` | JSON: `-J` / `--json` |
+| `lsblk` | ⚠️ | `-a`, `-b`, `-f`, `-m`, `-d`, `-o`, `-O`, `-P`, `-J`, `-p` | JSON: `-J` / `--json`. Rustux: C program (step 12) asking devmgr; `-b`, `-n`, `-J`/`--json` |
 | `lsblk -f` | ⬜ | | Filesystems |
 | `lsblk -m` | ⬜ | | Permissions |
 | `blkid` | ⬜ | `-o`, `-p`, `-s`, `-t`, `-u`, `-c`, `-L`, `-U` | JSON: `-o export` / `--json` |
@@ -402,7 +402,7 @@ Only the Debian/Ubuntu package tools are renamed; every other command keeps its 
 |---------|--------|-----------|-------|
 | `mount` | ⬜ | (see System Info) | |
 | `umount` | ⬜ | (see System Info) | |
-| `lsblk` | ⬜ | (see System Info) | |
+| `lsblk` | ⚠️ | (see System Info) | |
 | `blkid` | ⬜ | (see System Info) | |
 | `findmnt` | ⬜ | (see System Info) | |
 | `df` | ⚠️ | (see System Info) | Rustux: uutils coreutils; GNU text output, no JSON yet; reads `/etc/mtab` (tmpfs, bootfs, devfs) |
@@ -444,7 +444,7 @@ Only the Debian/Ubuntu package tools are renamed; every other command keeps its 
 
 | Command | Status | Key Flags | Notes |
 |---------|--------|-----------|-------|
-| `lspci` | ⬜ | `-n`, `-v`, `-b`, `-d`, `-s`, `-i`, `-m`, `-x`, `-D`, `-t` | JSON: `-v -nn` (parsable) |
+| `lspci` | ⚠️ | `-n`, `-v`, `-b`, `-d`, `-s`, `-i`, `-m`, `-x`, `-D`, `-t` | JSON: `-v -nn` (parsable). Rustux: C program (step 12) asking devmgr; `-n`, `-nn`, `-v`, `-k`, `-D`, `-s`, `-d`, `--json`; no `-b`, `-i`, `-m`, `-x`, `-t` |
 | `lsusb` | ⬜ | `-v`, `-d`, `-t`, `-s`, `-p` | |
 | `lsipc` | ⬜ | `-i`, `-g`, `-m`, `-q`, `-s`, `-u` | JSON: `--json` |
 | `lslocks` | ⬜ | `-u`, `-n`, `-p` | JSON: `--json` |

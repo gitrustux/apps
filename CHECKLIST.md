@@ -212,25 +212,25 @@ Only the Debian/Ubuntu package tools are renamed; every other command keeps its 
 
 | Command | Status | Key Flags | Notes |
 |---------|--------|-----------|-------|
-| `uname` | ⬜ | `-a`, `-s`, `-r`, `-v`, `-m`, `-p`, `-i`, `-o` | JSON: `--json` |
-| `uname -a` | ⬜ | | All info |
+| `uname` | ⚠️ | `-a`, `-s`, `-r`, `-v`, `-m`, `-p`, `-i`, `-o` | JSON: `--json`. Rustux: uutils coreutils; GNU text output, no JSON yet; `-o` prints Rustux |
+| `uname -a` | ✅ | | All info. Rustux: uutils coreutils |
 | `lsb_release` | ⬜ | `-a`, `-i`, `-d`, `-r`, `-c` | JSON: `--json` |
-| `hostname` | ⬜ | `-i`, `-I`, `-s`, `-f`, `-d`, `-y` | JSON: `--json` |
+| `hostname` | ⚠️ | `-i`, `-I`, `-s`, `-f`, `-d`, `-y` | JSON: `--json`. Rustux: C program; shows or sets `/etc/hostname`; no flags yet |
 | `hostnamectl` | ⬜ | `status`, `set-hostname`, `set-chassis` | JSON: `--json=pretty` |
-| `uptime` | ⬜ | `-p`, `--since`, `-s` | JSON: `--json` |
-| `free` | ⬜ | `-h`, `-b`, `-k`, `-m`, `-g`, `--si`, `-t`, `-o`, `-l` | JSON: `--json` |
+| `uptime` | ⚠️ | `-p`, `--since`, `-s` | JSON: `--json`. Rustux: C program; `--json` |
+| `free` | ✅ | `-h`, `-b`, `-k`, `-m`, `-g`, `--si`, `-t`, `-o`, `-l` | JSON: `--json`. Rustux: C program; `-k`, `-m`, `-g`, `-h`, `--json` |
 | `vmstat` | ⬜ | `-s`, `-d`, `-D`, `-p`, `-S`, `-m`, `-a`, `-t`, `-w` | JSON: `--json` |
 | `iostat` | ⬜ | `-c`, `-d`, `-x`, `-k`, `-m`, `-p`, `-t`, `-z`, `-h` | JSON: `--json` |
 | `lsblk` | ⬜ | `-a`, `-b`, `-f`, `-m`, `-d`, `-o`, `-O`, `-P`, `-J`, `-p` | JSON: `-J` / `--json` |
 | `lsblk -f` | ⬜ | | Filesystems |
 | `lsblk -m` | ⬜ | | Permissions |
 | `blkid` | ⬜ | `-o`, `-p`, `-s`, `-t`, `-u`, `-c`, `-L`, `-U` | JSON: `-o export` / `--json` |
-| `df` | ⬜ | `-h`, `-H`, `-i`, `-k`, `-l`, `-P`, `-T`, `-x`, `-t`, `-a` | JSON: `--output=json` |
-| `du` | ⬜ | `-h`, `-s`, `-c`, `-a`, `-x`, `-d`, `--max-depth`, `--time` | JSON: `--json` |
+| `df` | ⚠️ | `-h`, `-H`, `-i`, `-k`, `-l`, `-P`, `-T`, `-x`, `-t`, `-a` | JSON: `--output=json`. Rustux: uutils coreutils; GNU text output, no JSON yet; reads `/etc/mtab` (tmpfs, bootfs, devfs) |
+| `du` | ⚠️ | `-h`, `-s`, `-c`, `-a`, `-x`, `-d`, `--max-depth`, `--time` | JSON: `--json`. Rustux: uutils coreutils; GNU text output, no JSON yet |
 | `mount` | ⬜ | `-t`, `-a`, `-o`, `-v`, `-f`, `-l`, `-n`, `--bind`, `--move` | JSON: `--json` |
 | `umount` | ⬜ | `-f`, `-l`, `-n`, `-r`, `-d`, `-v`, `-a` | |
 | `findmnt` | ⬜ | `-a`, `-s`, `-t`, `-o`, `-J`, `-p`, `-r`, `-u`, `-U` | JSON: `-J` |
-| `stat` | ⬜ | `-c`, `-f`, `-L`, `-t`, `-Z` | JSON: `-c %` format |
+| `stat` | ⚠️ | `-c`, `-f`, `-L`, `-t`, `-Z` | JSON: `-c %` format. Rustux: uutils coreutils; GNU text output, no JSON yet |
 | `watch` | ⬜ | `-n`, `-d`, `-h`, `-t`, `-g`, `-e`, `-x` | |
 
 ---
@@ -239,24 +239,24 @@ Only the Debian/Ubuntu package tools are renamed; every other command keeps its 
 
 | Command | Status | Key Flags | Notes |
 |---------|--------|-----------|-------|
-| `ls` | ⬜ | `-l`, `-a`, `-h`, `-R`, `-t`, `-r`, `-S`, `-i`, `-F`, `-p` | JSON: `--json` |
-| `ls -l` | ⬜ | | Long format (JSON default) |
-| `ls -la` | ⬜ | | All, long |
+| `ls` | ⚠️ | `-l`, `-a`, `-h`, `-R`, `-t`, `-r`, `-S`, `-i`, `-F`, `-p` | JSON: `--json`. Rustux: uutils coreutils; GNU text output, no JSON yet; `ls -l` shows modes, sizes and UTC times |
+| `ls -l` | ⚠️ | | Long format (JSON default). Rustux: text output (no JSON yet) |
+| `ls -la` | ✅ | | All, long. Rustux: uutils coreutils |
 | `tree` | ⬜ | `-a`, `-d`, `-f`, `-F`, `-h`, `-L`, `-p`, `-s`, `-u`, `-g` | JSON: `-J` |
-| `pwd` | ⬜ | `-L`, `-P` | JSON: `--json` |
-| `cd` | ⬜ | | Shell built-in |
-| `cp` | ⬜ | `-r`, `-a`, `-v`, `-p`, `-n`, `-i`, `-b`, `--backup` | JSON: `--json` (log only) |
-| `mv` | ⬜ | `-i`, `-f`, `-n`, `-v`, `-b` | JSON: `--json` (log only) |
-| `rm` | ⬜ | `-r`, `-f`, `-i`, `-v`, `-d` | JSON: `--json` (log only) |
-| `rmdir` | ⬜ | `-p`, `-v` | |
-| `mkdir` | ⬜ | `-p`, `-v`, `-m` | JSON: `--json` (log only) |
+| `pwd` | ⚠️ | `-L`, `-P` | JSON: `--json`. Rustux: uutils coreutils; GNU text output, no JSON yet |
+| `cd` | ✅ | | Shell built-in. Rustux: shell built-in |
+| `cp` | ⚠️ | `-r`, `-a`, `-v`, `-p`, `-n`, `-i`, `-b`, `--backup` | JSON: `--json` (log only). Rustux: uutils coreutils; GNU text output, no JSON yet |
+| `mv` | ⚠️ | `-i`, `-f`, `-n`, `-v`, `-b` | JSON: `--json` (log only). Rustux: uutils coreutils; GNU text output, no JSON yet |
+| `rm` | ⚠️ | `-r`, `-f`, `-i`, `-v`, `-d` | JSON: `--json` (log only). Rustux: uutils coreutils; GNU text output, no JSON yet |
+| `rmdir` | ✅ | `-p`, `-v` | Rustux: uutils coreutils |
+| `mkdir` | ⚠️ | `-p`, `-v`, `-m` | JSON: `--json` (log only). Rustux: uutils coreutils; GNU text output, no JSON yet |
 | `install` | ⬜ | `-m`, `-o`, `-g`, `-d`, `-v`, `-b` | |
 | `file` | ⬜ | `-b`, `-i`, `-z`, `-k`, `-L`, `-s`, `--mime-type` | JSON: `--json` |
-| `touch` | ⬜ | `-a`, `-m`, `-c`, `-d`, `-r`, `-t` | |
-| `basename` | ⬜ | `-a`, `-s` | JSON: `--json` |
-| `dirname` | ⬜ | | JSON: `--json` |
-| `realpath` | ⬜ | `-e`, `-m`, `-s`, `-z` | JSON: `--json` |
-| `readlink` | ⬜ | `-f`, `-e`, `-m`, `-n`, `-v`, `-z` | JSON: `--json` |
+| `touch` | ⚠️ | `-a`, `-m`, `-c`, `-d`, `-r`, `-t` | Rustux: uutils coreutils; GNU text output, no JSON yet |
+| `basename` | ⚠️ | `-a`, `-s` | JSON: `--json`. Rustux: uutils coreutils; GNU text output, no JSON yet |
+| `dirname` | ⚠️ | | JSON: `--json`. Rustux: uutils coreutils; GNU text output, no JSON yet |
+| `realpath` | ⚠️ | `-e`, `-m`, `-s`, `-z` | JSON: `--json`. Rustux: uutils coreutils; GNU text output, no JSON yet |
+| `readlink` | ⚠️ | `-f`, `-e`, `-m`, `-n`, `-v`, `-z` | JSON: `--json`. Rustux: uutils coreutils; GNU text output, no JSON yet |
 
 ---
 
@@ -264,30 +264,30 @@ Only the Debian/Ubuntu package tools are renamed; every other command keeps its 
 
 | Command | Status | Key Flags | Notes |
 |---------|--------|-----------|-------|
-| `cat` | ⬜ | `-n`, `-b`, `-s`, `-E`, `-T`, `-v`, `-e`, `-A` | |
-| `less` | ⬜ | `-N`, `-S`, `-F`, `-R`, `-m`, `-M`, `-i`, `--follow-name` | |
-| `more` | ⬜ | `-d`, `-l`, `-f`, `-p`, `-c`, `-s`, `-u` | |
-| `head` | ⬜ | `-n`, `-c`, `-v`, `-q`, `-z` | JSON: `--json` (line counts) |
-| `tail` | ⬜ | `-n`, `-f`, `-F`, `--pid`, `-v`, `-q`, `-z`, `--retry` | JSON: `--json` (follow mode) |
-| `nl` | ⬜ | `-b`, `-h`, `-i`, `-l`, `-n`, `-p`, `-s`, `-v`, `-w` | JSON: `--json` |
-| `wc` | ⬜ | `-c`, `-l`, `-w`, `-m`, `-L` | JSON: `--json` |
-| `sort` | ⬜ | `-b`, `-d`, `-f`, `-g`, `-i`, `-M`, `-h`, `-n`, `-R`, `-r` | JSON: `--json` |
-| `sort -u` | ⬜ | | Unique |
-| `sort -k` | ⬜ | | Key field |
-| `sort -t` | ⬜ | | Field separator |
-| `uniq` | ⬜ | `-c`, `-d`, `-D`, `-u`, `-i`, `-z`, `-f`, `-s`, `-w` | JSON: `--json` |
-| `cut` | ⬜ | `-b`, `-c`, `-d`, `-f`, `-s`, `--complement`, `--output-delimiter` | |
-| `paste` | ⬜ | `-d`, `-s`, `-z` | |
-| `tr` | ⬜ | `-c`, `-C`, `-d`, `-s`, `-t` | |
+| `cat` | ⚠️ | `-n`, `-b`, `-s`, `-E`, `-T`, `-v`, `-e`, `-A` | Rustux: uutils coreutils; GNU text output, no JSON yet |
+| `less` | ⚠️ | `-N`, `-S`, `-F`, `-R`, `-m`, `-M`, `-i`, `--follow-name` | Rustux: `tools`; search, `-N`, `-S`, `-F`, `-i`; no `--follow-name` |
+| `more` | ⚠️ | `-d`, `-l`, `-f`, `-p`, `-c`, `-s`, `-u` | Rustux: link to `less` |
+| `head` | ⚠️ | `-n`, `-c`, `-v`, `-q`, `-z` | JSON: `--json` (line counts). Rustux: uutils coreutils; GNU text output, no JSON yet |
+| `tail` | ⚠️ | `-n`, `-f`, `-F`, `--pid`, `-v`, `-q`, `-z`, `--retry` | JSON: `--json` (follow mode). Rustux: uutils coreutils; GNU text output, no JSON yet; `-f` polls once a second (no inotify) |
+| `nl` | ⚠️ | `-b`, `-h`, `-i`, `-l`, `-n`, `-p`, `-s`, `-v`, `-w` | JSON: `--json`. Rustux: uutils coreutils; GNU text output, no JSON yet |
+| `wc` | ⚠️ | `-c`, `-l`, `-w`, `-m`, `-L` | JSON: `--json`. Rustux: uutils coreutils; GNU text output, no JSON yet |
+| `sort` | ⚠️ | `-b`, `-d`, `-f`, `-g`, `-i`, `-M`, `-h`, `-n`, `-R`, `-r` | JSON: `--json`. Rustux: uutils coreutils; GNU text output, no JSON yet |
+| `sort -u` | ✅ | | Unique. Rustux: uutils coreutils |
+| `sort -k` | ✅ | | Key field. Rustux: uutils coreutils |
+| `sort -t` | ✅ | | Field separator. Rustux: uutils coreutils |
+| `uniq` | ⚠️ | `-c`, `-d`, `-D`, `-u`, `-i`, `-z`, `-f`, `-s`, `-w` | JSON: `--json`. Rustux: uutils coreutils; GNU text output, no JSON yet |
+| `cut` | ⚠️ | `-b`, `-c`, `-d`, `-f`, `-s`, `--complement`, `--output-delimiter` | Rustux: uutils coreutils; GNU text output, no JSON yet |
+| `paste` | ⚠️ | `-d`, `-s`, `-z` | Rustux: uutils coreutils; GNU text output, no JSON yet |
+| `tr` | ⚠️ | `-c`, `-C`, `-d`, `-s`, `-t` | Rustux: uutils coreutils; GNU text output, no JSON yet |
 | `column` | ⬜ | `-t`, `-s`, `-o`, `-x`, `-n` | JSON: `--json` |
-| `fold` | ⬜ | `-b`, `-s`, `-w` | |
-| `fmt` | ⬜ | `-w`, `-p`, `-s`, `-t`, `-c` | |
-| `join` | ⬜ | `-a`, `-v`, `-1`, `-2`, `-j`, `-o`, `-t`, `-i` | JSON: `--json` |
+| `fold` | ⚠️ | `-b`, `-s`, `-w` | Rustux: uutils coreutils; GNU text output, no JSON yet |
+| `fmt` | ⚠️ | `-w`, `-p`, `-s`, `-t`, `-c` | Rustux: uutils coreutils; GNU text output, no JSON yet |
+| `join` | ⚠️ | `-a`, `-v`, `-1`, `-2`, `-j`, `-o`, `-t`, `-i` | JSON: `--json`. Rustux: uutils coreutils; GNU text output, no JSON yet |
 | `awk` | ⬜ | `-F`, `-v`, `-f` | |
 | `sed` | ⬜ | `-n`, `-e`, `-f`, `-E`, `-r`, `-i`, `-z` | |
-| `grep` | ⬜ | `-i`, `-v`, `-c`, `-l`, `-L`, `-n`, `-H`, `-h`, `-o`, `-q`, `-m`, `-A`, `-B`, `-C`, `-R`, `-r`, `-E`, `-F`, `-e`, `-f`, `-x`, `-w`, `-z`, `--color`, `--exclude`, `--exclude-dir`, `--include`, `--binary-files` | JSON: `--json` (matches only) |
-| `egrep` | ⬜ | | Extended grep |
-| `fgrep` | ⬜ | | Fixed grep |
+| `grep` | ✅ | `-i`, `-v`, `-c`, `-l`, `-L`, `-n`, `-H`, `-h`, `-o`, `-q`, `-m`, `-A`, `-B`, `-C`, `-R`, `-r`, `-E`, `-F`, `-e`, `-f`, `-x`, `-w`, `-z`, `--color`, `--exclude`, `--exclude-dir`, `--include`, `--binary-files` | JSON: `--json` (matches only). Rustux: `tools` (Rust regex); `--json` prints matches as JSON lines; BRE, ERE (`-E`), fixed (`-F`); `-P` not supported |
+| `egrep` | ✅ | | Extended grep. Rustux: `tools`, same as `grep -E` |
+| `fgrep` | ✅ | | Fixed grep. Rustux: `tools`, same as `grep -F` |
 | `strings` | ⬜ | `-a`, `-f`, `-n`, `-t`, `-e`, `-o` | JSON: `--json` |
 
 ---
@@ -296,12 +296,12 @@ Only the Debian/Ubuntu package tools are renamed; every other command keeps its 
 
 | Command | Status | Key Flags | Notes |
 |---------|--------|-----------|-------|
-| `find` | ⬜ | `-name`, `-iname`, `-type`, `-size`, `-mtime`, `-atime`, `-ctime`, `-perm`, `-user`, `-group`, `-uid`, `-gid`, `-empty`, `-executable`, `-readable`, `-writable`, `-depth`, `-maxdepth`, `-mindepth`, `-xdev`, `-x`, `-noleaf`, `-regextype`, `-exec`, `-ok`, `-print`, `-print0`, `-ls`, `-delete`, `-prune` | JSON: `--json` |
+| `find` | ⚠️ | `-name`, `-iname`, `-type`, `-size`, `-mtime`, `-atime`, `-ctime`, `-perm`, `-user`, `-group`, `-uid`, `-gid`, `-empty`, `-executable`, `-readable`, `-writable`, `-depth`, `-maxdepth`, `-mindepth`, `-xdev`, `-x`, `-noleaf`, `-regextype`, `-exec`, `-ok`, `-print`, `-print0`, `-ls`, `-delete`, `-prune` | JSON: `--json`. Rustux: uutils findutils (`-user`/`-group` see root only; no JSON yet) |
 | `locate` | ⬜ | `-i`, `-c`, `-e`, `-d`, `-r`, `-w`, `-l`, `-0`, `-S` | JSON: `--json` |
 | `updatedb` | ⬜ | `-l`, `-U`, `-o`, `-e`, `-f`, `-q` | |
 | `which` | ⬜ | `-a`, `-s` | JSON: `--json` |
 | `whereis` | ⬜ | `-b`, `-m`, `-s`, `-u` | JSON: `--json` |
-| `xargs` | ⬜ | `-0`, `-a`, `-t`, `-n`, `-P`, `-p`, `-I`, `-i`, `-L`, `-d` | |
+| `xargs` | ✅ | `-0`, `-a`, `-t`, `-n`, `-P`, `-p`, `-I`, `-i`, `-L`, `-d` | Rustux: uutils findutils (patched to look up `$PATH` itself); `-P` works |
 
 ---
 
@@ -351,8 +351,8 @@ Only the Debian/Ubuntu package tools are renamed; every other command keeps its 
 |---------|--------|-----------|-------|
 | `login` | ⬜ | `-f`, `-h`, `-p` | |
 | `logout` | ⬜ | | |
-| `whoami` | ⬜ | | JSON: `--json` |
-| `id` | ⬜ | `-u`, `-g`, `-G`, `-n`, `-r`, `-z` | JSON: `--json` |
+| `whoami` | ⚠️ | | JSON: `--json`. Rustux: uutils coreutils; GNU text output, no JSON yet |
+| `id` | ⚠️ | `-u`, `-g`, `-G`, `-n`, `-r`, `-z` | JSON: `--json`. Rustux: uutils coreutils; GNU text output, no JSON yet |
 | `groups` | ⬜ | | JSON: `--json` |
 | `passwd` | ⬜ | `-d`, `-e`, `-i`, `-k`, `-l`, `-n`, `-S`, `-u`, `-w` | JSON: `-S` |
 | `chsh` | ⬜ | `-s`, `-l` | |
@@ -377,15 +377,15 @@ Only the Debian/Ubuntu package tools are renamed; every other command keeps its 
 
 | Command | Status | Key Flags | Notes |
 |---------|--------|-----------|-------|
-| `ps` | ⬜ | `-a`, `-u`, `-x`, `-e`, `-f`, `-l`, `-y`, `-o`, `--sort`, `-p`, `--ppid`, `-t`, `-C` | JSON: `--format=json` |
+| `ps` | ⚠️ | `-a`, `-u`, `-x`, `-e`, `-f`, `-l`, `-y`, `-o`, `--sort`, `-p`, `--ppid`, `-t`, `-C` | JSON: `--format=json`. Rustux: C program using kernel object info; `--json`; no BSD/UNIX flags yet |
 | `ps aux` | ⬜ | | BSD style |
 | `ps -ef` | ⬜ | | UNIX style |
-| `top` | ⬜ | `-b`, `-n`, `-d`, `-p`, `-u`, `-U`, `-H` | JSON batch: `-b -n 1` |
+| `top` | ⚠️ | `-b`, `-n`, `-d`, `-p`, `-u`, `-U`, `-H` | JSON batch: `-b -n 1`. Rustux: C program; `-b`, `-n`, `-d`; no JSON yet |
 | `htop` | ⬜ | | TUI only |
 | `atop` | ⬜ | `-b`, `-w`, `-M`, `-P`, `-C`, `-m`, `-A`, `-R` | JSON: `--json` |
 | `nice` | ⬜ | `-n`, `--adjustment` | |
 | `renice` | ⬜ | `-n`, `-p`, `-u`, `-g` | JSON: `--json` |
-| `kill` | ⬜ | `-l`, `-s`, `-SIGNAL` | JSON: `-l` |
+| `kill` | ⚠️ | `-l`, `-s`, `-SIGNAL` | JSON: `-l`. Rustux: C program; ends the process (no signals yet, `-SIG` ignored) |
 | `killall` | ⬜ | `-e`, `-i`, `-q`, `-r`, `-s`, `-u`, `-v` | JSON: `--json` |
 | `pkill` | ⬜ | `-f`, `-n`, `-o`, `-P`, `-t`, `-u`, `-x`, `-s` | JSON: `--json` |
 | `bg` | ⬜ | | |
@@ -405,8 +405,8 @@ Only the Debian/Ubuntu package tools are renamed; every other command keeps its 
 | `lsblk` | ⬜ | (see System Info) | |
 | `blkid` | ⬜ | (see System Info) | |
 | `findmnt` | ⬜ | (see System Info) | |
-| `df` | ⬜ | (see System Info) | |
-| `du` | ⬜ | (see System Info) | |
+| `df` | ⚠️ | (see System Info) | Rustux: uutils coreutils; GNU text output, no JSON yet; reads `/etc/mtab` (tmpfs, bootfs, devfs) |
+| `du` | ⚠️ | (see System Info) | Rustux: uutils coreutils; GNU text output, no JSON yet |
 | `fsck` | ⬜ | `-a`, `-A`, `-C`, `-f`, `-M`, `-N`, `-P`, `-r`, `-R`, `-T`, `-V`, `-y` | JSON: `--json` |
 | `fsck.ext4` | ⬜ | `-b`, `-c`, `-f`, `-p`, `-y`, `-n`, `-v` | |
 | `mkfs` | ⬜ | `-t`, `-c`, `-v`, `-n` | |
@@ -426,15 +426,15 @@ Only the Debian/Ubuntu package tools are renamed; every other command keeps its 
 
 | Command | Status | Key Flags | Notes |
 |---------|--------|-----------|-------|
-| `reboot` | ⬜ | `-f`, `-p`, `-w` | |
+| `reboot` | ⚠️ | `-f`, `-p`, `-w` | Rustux: C program (ACPI reset); no flags yet |
 | `shutdown` | ⬜ | `-h`, `-P`, `-H`, `-r`, `-k`, `-c`, `-t`, `-a`, `--no-wall` | |
-| `poweroff` | ⬜ | `-f`, `-w`, `-p` | |
+| `poweroff` | ⚠️ | `-f`, `-w`, `-p` | Rustux: C program (ACPI S5); no flags yet |
 | `halt` | ⬜ | `-f`, `-p`, `-w` | |
 | `wall` | ⬜ | `-n`, `-t`, `-g`, `-G` | |
 | `write` | ⬜ | | |
 | `chvt` | ⬜ | | |
 | `tty` | ⬜ | `-s`, `--silent` | |
-| `clear` | ⬜ | | |
+| `clear` | ✅ | Rustux: shell built-in |
 | `reset` | ⬜ | `-I`, `-q`, `-w`, `-e` | |
 | `setterm` | ⬜ | `-term`, `-reset`, `-initialize`, `-cursor`, `-blank`, `-powersave`, `-foreground`, `-background`, `-ulink`, `-store` | |
 
@@ -465,7 +465,7 @@ Only the Debian/Ubuntu package tools are renamed; every other command keeps its 
 
 | Command | Status | Key Flags | Notes |
 |---------|--------|-----------|-------|
-| `dmesg` | ⬜ | `-c`, `-C`, `-T`, `-D`, `-E`, `-f`, `-H`, `-k`, `-l`, `-n`, `-r`, `-s`, `-t`, `-w`, `-x`, `-P`, `--level`, `--facility`, `--human`, `--raw` | JSON: `--json` |
+| `dmesg` | ⚠️ | `-c`, `-C`, `-T`, `-D`, `-E`, `-f`, `-H`, `-k`, `-l`, `-n`, `-r`, `-s`, `-t`, `-w`, `-x`, `-P`, `--level`, `--facility`, `--human`, `--raw` | JSON: `--json`. Rustux: C program; prints the kernel log; no flags yet |
 | `journalctl` | ⬜ | `-b`, `-f`, `-k`, `-u`, `-r`, `-n`, `-o`, `-a`, `-c`, `--since`, `--until`, `--follow`, `--rotate`, `-vacuum`, `-S`, `-D`, `--user`, `--disk-usage` | JSON: `-o json` |
 | `logger` | ⬜ | `-i`, `-f`, `-p`, `-s`, `-t`, `-u`, `--journald`, `--id` | |
 | `strace` | ⬜ | `-p`, `-f`, `-ff`, `-o`, `-e`, `-s`, `-v`, `-yy`, `-E`, `-c`, `-C` | JSON: `-f -o strace.log` (parseable) |
@@ -495,10 +495,10 @@ Only the Debian/Ubuntu package tools are renamed; every other command keeps its 
 
 | Command | Status | Key Flags | Notes |
 |---------|--------|-----------|-------|
-| `tar` | ⬜ | `-c`, `-x`, `-t`, `-v`, `-f`, `-z`, `-j`, `-J`, `-C`, `-p`, `-P`, `--exclude`, `--files-from`, `--transform`, `--verify`, `-W`, `-M` | JSON: `--list --format=json` |
-| `gzip` | ⬜ | `-d`, `-k`, `-l`, `-v`, `-r`, `-S`, `-t`, `-1` to `-9`, `--best`, `--fast` | JSON: `-l` |
-| `gunzip` | ⬜ | `-c`, `-f`, `-k`, `-l`, `-n`, `-N`, `-r`, `-t`, `-v` | |
-| `zcat` | ⬜ | `-f`, `-h`, `-l`, `-L`, `-n`, `-N`, `-q`, `-r`, `-S`, `-v` | |
+| `tar` | ⚠️ | `-c`, `-x`, `-t`, `-v`, `-f`, `-z`, `-j`, `-J`, `-C`, `-p`, `-P`, `--exclude`, `--files-from`, `--transform`, `--verify`, `-W`, `-M` | JSON: `--list --format=json`. Rustux: `tools` (tar + flate2 crates); `c`, `x`, `t`, `z`, `C`, `v`, `O`, `--exclude`; `t --json`; no `-j`/`-J` |
+| `gzip` | ⚠️ | `-d`, `-k`, `-l`, `-v`, `-r`, `-S`, `-t`, `-1` to `-9`, `--best`, `--fast` | JSON: `-l`. Rustux: `tools` (flate2); `-d`, `-k`, `-c`, `-f`, `-1`..`-9`; no `-l`, `-r` |
+| `gunzip` | ⚠️ | `-c`, `-f`, `-k`, `-l`, `-n`, `-N`, `-r`, `-t`, `-v` | Rustux: `tools` (flate2); `-c`, `-k`, `-f` |
+| `zcat` | ✅ | `-f`, `-h`, `-l`, `-L`, `-n`, `-N`, `-q`, `-r`, `-S`, `-v` | Rustux: `tools`, same as `gunzip -c` |
 | `zgrep` | ⬜ | `-e`, `-f`, `-h`, `-i`, `-l`, `-n`, `-v`, `-x` | |
 | `bzip2` | ⬜ | `-d`, `-z`, `-k`, `-f`, `-v`, `-1` to `-9` | JSON: `--keep` |
 | `bunzip2` | ⬜ | `-f`, `-k`, `-v` | |
@@ -539,12 +539,12 @@ Only the Debian/Ubuntu package tools are renamed; every other command keeps its 
 
 | Command | Status | Key Flags | Notes |
 |---------|--------|-----------|-------|
-| `chmod` | ⬜ | `-c`, `-f`, `-v`, `-R`, `--reference`, `--changes`, `--no-preserve-root`, `--preserve-root` | JSON: `--changes` |
+| `chmod` | ✅ | `-c`, `-f`, `-v`, `-R`, `--reference`, `--changes`, `--no-preserve-root`, `--preserve-root` | JSON: `--changes`. Rustux: uutils coreutils; modes are stored, not enforced until users exist (step 17) |
 | `chown` | ⬜ | `-c`, `-f`, `-h`, `-R`, `-v`, `--from`, `--reference`, `--changes` | JSON: `--changes` |
 | `chgrp` | ⬜ | `-c`, `-f`, `-h`, `-R`, `-v`, `--reference`, `--changes` | JSON: `--changes` |
 | `getfacl` | ⬜ | `-a`, `-d`, `-R`, `-p`, `-n`, `--access`, `--default`, `--no-effective`, `--skip-base`, `--all-effective`, `--set`, `--set-file`, `--mask` | JSON: `--no-effective` |
 | `setfacl` | ⬜ | `-R`, `-b`, `-k`, `-n`, `-d`, `-m`, `-M`, `-x`, `-X`, `--restore`, `--set`, `--set-file`, `--mask` | |
-| `umask` | ⬜ | `-S`, `-p` | |
+| `umask` | ⚠️ | `-S`, `-p` | Rustux: shell built-in; `-S` |
 
 ---
 
@@ -553,18 +553,18 @@ Only the Debian/Ubuntu package tools are renamed; every other command keeps its 
 | Command | Status | Key Flags | Notes |
 |---------|--------|-----------|-------|
 | `bash` | ⬜ | `-c`, `-s`, `-r`, `-i`, `-l`, `-n`, `-x`, `-v`, `--noprofile`, `--norc`, `--rcfile`, `--init-file`, `--dump-strings`, `--dump-po-filenames` | |
-| `sh` | ⬜ | | |
+| `sh` | ⚠️ | Rustux: link to `shell` (POSIX-like: if/while/for/case, functions, `$(...)`, `$((...))`, pipes, redirection, `#!` scripts) |
 | `dash` | ⬜ | | |
 | `zsh` | ⬜ | | |
-| `env` | ⬜ | `-i`, `-u`, `--ignore-environment`, `--null`, `-0` | JSON: `-0` |
-| `printenv` | ⬜ | `-0`, `--null` | JSON: `-0` |
-| `set` | ⬜ | `-a`, `-b`, `-e`, `-u`, `-x`, `-o`, `-h` | |
-| `unset` | ⬜ | `-f`, `-v` | |
-| `export` | ⬜ | `-n`, `-p`, `-f` | |
-| `source` | ⬜ | | |
-| `alias` | ⬜ | `-p` | |
-| `unalias` | ⬜ | `-a` | |
-| `history` | ⬜ | `-c`, `-d`, `-a`, `-n`, `-r`, `-w`, `-p`, `-s` | JSON: `-w -n` |
+| `env` | ⚠️ | `-i`, `-u`, `--ignore-environment`, `--null`, `-0` | JSON: `-0`. Rustux: uutils coreutils; GNU text output, no JSON yet |
+| `printenv` | ⚠️ | `-0`, `--null` | JSON: `-0`. Rustux: uutils coreutils; GNU text output, no JSON yet |
+| `set` | ✅ | `-a`, `-b`, `-e`, `-u`, `-x`, `-o`, `-h` | Rustux: shell built-in |
+| `unset` | ✅ | `-f`, `-v` | Rustux: shell built-in |
+| `export` | ✅ | `-n`, `-p`, `-f` | Rustux: shell built-in |
+| `source` | ✅ | Rustux: shell built-in |
+| `alias` | ✅ | `-p` | Rustux: shell built-in |
+| `unalias` | ✅ | `-a` | Rustux: shell built-in |
+| `history` | ⚠️ | `-c`, `-d`, `-a`, `-n`, `-r`, `-w`, `-p`, `-s` | JSON: `-w -n`. Rustux: shell built-in; lists only |
 | `fc` | ⬜ | `-e`, `-l`, `-n`, `-r`, `-s` | |
 | `bind` | ⬜ | `-q`, `-l`, `-p`, `-P`, `-m`, `-s`, `-u`, `-V`, `-v` | |
 | `complete` | ⬜ | `-p`, `-r`, `-D`, `-E`, `-F`, `-G`, `-W`, `-P`, `-S`, `-A`, `-G`, `-W`, `-a`, `-b`, `-c`, `-d`, `-e`, `-f`, `-j`, `-k`, `-n`, `-o`, `-s`, `-u`, `-v`, `-X`, `-M`, `-o`, `-T` | |
@@ -579,6 +579,8 @@ Only the Debian/Ubuntu package tools are renamed; every other command keeps its 
 - ✅ Implemented
 - 🔄 Needs refactoring
 - ⚠️ Partially implemented
+
+Statuses are for Rustux (checklist step 11 of the rustux repo). Its `docs/COMMANDS.md` lists where each command comes from and how it differs from GNU. Most commands are uutils coreutils and keep GNU's text output, so a row that asks for JSON stays ⚠️ until JSON is added.
 
 ## Output Format Standards
 

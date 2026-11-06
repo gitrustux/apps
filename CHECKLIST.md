@@ -225,10 +225,10 @@ Only the Debian/Ubuntu package tools are renamed; every other command keeps its 
 | `lsblk -f` | ✅ | | Filesystems. Rustux: FSTYPE, LABEL, UUID by signature (vfat, exfat, ntfs, BitLocker, ext2/3/4, swap, iso9660) |
 | `lsblk -m` | ⬜ | | Permissions |
 | `blkid` | ⚠️ | `-o`, `-p`, `-s`, `-t`, `-u`, `-c`, `-L`, `-U` | JSON: `-o export` / `--json`. Rustux: C program (step 13); `-o full/value/export`, `-s`; device names are devmgr's (`vda1`), not `/dev` paths; no `-p`, `-t`, `-L`, `-U` |
-| `df` | ⚠️ | `-h`, `-H`, `-i`, `-k`, `-l`, `-P`, `-T`, `-x`, `-t`, `-a` | JSON: `--output=json`. Rustux: uutils coreutils; GNU text output, no JSON yet; reads `/etc/mtab` (tmpfs, bootfs, devfs) |
+| `df` | ⚠️ | `-h`, `-H`, `-i`, `-k`, `-l`, `-P`, `-T`, `-x`, `-t`, `-a` | JSON: `--output=json`. Rustux: uutils coreutils; GNU text output, no JSON yet; reads `/etc/mtab` (tmpfs, bootfs, devfs, and mounted FAT disks with their cluster counts, step 14) |
 | `du` | ⚠️ | `-h`, `-s`, `-c`, `-a`, `-x`, `-d`, `--max-depth`, `--time` | JSON: `--json`. Rustux: uutils coreutils; GNU text output, no JSON yet |
-| `mount` | ⬜ | `-t`, `-a`, `-o`, `-v`, `-f`, `-l`, `-n`, `--bind`, `--move` | JSON: `--json` |
-| `umount` | ⬜ | `-f`, `-l`, `-n`, `-r`, `-d`, `-v`, `-a` | |
+| `mount` | ⚠️ | `-t`, `-a`, `-o`, `-v`, `-f`, `-l`, `-n`, `--bind`, `--move` | JSON: `--json`. Rustux: C program (step 14); lists `/etc/mtab`, `-t vfat`, `-o ro/rw/noauto/nofail`, `-a` from `/etc/fstab` (run at boot: EFI partition at `/boot/efi`); sources: names, `LABEL=`, `UUID=`, `PARTLABEL=`, `EFI`; vfat only; no `-v`, `-f`, `-l`, `-n`, `--bind`, `--move`, JSON |
+| `umount` | ⚠️ | `-f`, `-l`, `-n`, `-r`, `-d`, `-v`, `-a` | Rustux: C program (step 14); `-f`, `-a`; by directory or device; no `-l`, `-n`, `-r`, `-d`, `-v` |
 | `findmnt` | ⬜ | `-a`, `-s`, `-t`, `-o`, `-J`, `-p`, `-r`, `-u`, `-U` | JSON: `-J` |
 | `stat` | ⚠️ | `-c`, `-f`, `-L`, `-t`, `-Z` | JSON: `-c %` format. Rustux: uutils coreutils; GNU text output, no JSON yet |
 | `watch` | ⬜ | `-n`, `-d`, `-h`, `-t`, `-g`, `-e`, `-x` | |
@@ -400,19 +400,21 @@ Only the Debian/Ubuntu package tools are renamed; every other command keeps its 
 
 | Command | Status | Key Flags | Notes |
 |---------|--------|-----------|-------|
-| `mount` | ⬜ | (see System Info) | |
-| `umount` | ⬜ | (see System Info) | |
+| `mount` | ⚠️ | (see System Info) | |
+| `umount` | ⚠️ | (see System Info) | |
 | `lsblk` | ⚠️ | (see System Info) | |
 | `blkid` | ⚠️ | (see System Info) | |
 | `fdisk` | ⚠️ | `-l` | Rustux: listing only (step 13); tables are changed with `gpt` |
 | `gpt` | ✅ | `show`, `create`, `add`, `remove`, `label`, `type`, `destroy`, `types` | Rustux's GPT tool (step 13), FreeBSD-like |
 | `blk` | ✅ | `read`, `write`, `info`, `rescan`, `flush` | Rustux's: block devices from the shell while they are not in `/dev` (step 13) |
 | `findmnt` | ⬜ | (see System Info) | |
-| `df` | ⚠️ | (see System Info) | Rustux: uutils coreutils; GNU text output, no JSON yet; reads `/etc/mtab` (tmpfs, bootfs, devfs) |
+| `df` | ⚠️ | (see System Info) | Rustux: uutils coreutils; GNU text output, no JSON yet; reads `/etc/mtab` (tmpfs, bootfs, devfs, FAT disks) |
 | `du` | ⚠️ | (see System Info) | Rustux: uutils coreutils; GNU text output, no JSON yet |
 | `fsck` | ⬜ | `-a`, `-A`, `-C`, `-f`, `-M`, `-N`, `-P`, `-r`, `-R`, `-T`, `-V`, `-y` | JSON: `--json` |
 | `fsck.ext4` | ⬜ | `-b`, `-c`, `-f`, `-p`, `-y`, `-n`, `-v` | |
-| `mkfs` | ⬜ | `-t`, `-c`, `-v`, `-n` | |
+| `mkfs` | ⬜ | `-t`, `-c`, `-v`, `-n` | Rustux: `mkfs.fat` instead (below) |
+| `mkfs.fat` / `mkfs.vfat` | ✅ | `-F`, `-n`, `-i`, `-s`, `-I` | Rustux: C program (step 14); FAT12/16/32, type and cluster size by size as Windows formats |
+| `fsck.fat` / `fsck.vfat` | ⚠️ | `-a`, `-n`, `-v` | Rustux: C program (step 14); checks only; `-a` corrects the FSInfo free count |
 | `mkfs.ext4` | ⬜ | `-b`, `-F`, `-E`, `-I`, `-J`, `-L`, `-m`, `-n`, `-q` | |
 | `mkswap` | ⬜ | `-f`, `-p`, `-U`, `-L` | |
 | `swapon` | ⬜ | `-a`, `-d`, `-e`, `-f`, `-p`, `-s`, `-U`, `-v` | JSON: `--json` |

@@ -227,7 +227,7 @@ Only the Debian/Ubuntu package tools are renamed; every other command keeps its 
 | `blkid` | ⚠️ | `-o`, `-p`, `-s`, `-t`, `-u`, `-c`, `-L`, `-U` | JSON: `-o export` / `--json`. Rustux: C program (step 13); `-o full/value/export`, `-s`; device names are devmgr's (`vda1`), not `/dev` paths; no `-p`, `-t`, `-L`, `-U` |
 | `df` | ⚠️ | `-h`, `-H`, `-i`, `-k`, `-l`, `-P`, `-T`, `-x`, `-t`, `-a` | JSON: `--output=json`. Rustux: uutils coreutils; GNU text output, no JSON yet; reads `/etc/mtab` (tmpfs, bootfs, devfs, and mounted FAT disks with their cluster counts, step 14) |
 | `du` | ⚠️ | `-h`, `-s`, `-c`, `-a`, `-x`, `-d`, `--max-depth`, `--time` | JSON: `--json`. Rustux: uutils coreutils; GNU text output, no JSON yet |
-| `mount` | ⚠️ | `-t`, `-a`, `-o`, `-v`, `-f`, `-l`, `-n`, `--bind`, `--move` | JSON: `--json`. Rustux: C program (step 14); lists `/etc/mtab`, `-t vfat`, `-o ro/rw/noauto/nofail`, `-a` from `/etc/fstab` (run at boot: EFI partition at `/boot/efi`); sources: names, `LABEL=`, `UUID=`, `PARTLABEL=`, `EFI`; vfat and ext2 (step 15; `--root` for init's root filesystem); no `-v`, `-f`, `-l`, `-n`, `--bind`, `--move`, JSON |
+| `mount` | ⚠️ | `-t`, `-a`, `-o`, `-v`, `-f`, `-l`, `-n`, `--bind`, `--move` | JSON: `--json`. Rustux: C program (step 14); lists `/etc/mtab`, `-t vfat`, `-o ro/rw/noauto/nofail`, `-a` from `/etc/fstab` (run at boot: EFI partition at `/boot/efi`); sources: names, `LABEL=`, `UUID=`, `PARTLABEL=`, `EFI`; vfat, ext2 (step 15; `--root` for init's root filesystem), ext3 and ext4 (step 16: journal replayed at mount); no `-v`, `-f`, `-l`, `-n`, `--bind`, `--move`, JSON |
 | `umount` | ⚠️ | `-f`, `-l`, `-n`, `-r`, `-d`, `-v`, `-a` | Rustux: C program (step 14); `-f`, `-a`; by directory or device; no `-l`, `-n`, `-r`, `-d`, `-v` |
 | `findmnt` | ⬜ | `-a`, `-s`, `-t`, `-o`, `-J`, `-p`, `-r`, `-u`, `-U` | JSON: `-J` |
 | `stat` | ⚠️ | `-c`, `-f`, `-L`, `-t`, `-Z` | JSON: `-c %` format. Rustux: uutils coreutils; GNU text output, no JSON yet |
@@ -411,17 +411,17 @@ Only the Debian/Ubuntu package tools are renamed; every other command keeps its 
 | `df` | ⚠️ | (see System Info) | Rustux: uutils coreutils; GNU text output, no JSON yet; reads `/etc/mtab` (tmpfs, bootfs, devfs, FAT disks) |
 | `du` | ⚠️ | (see System Info) | Rustux: uutils coreutils; GNU text output, no JSON yet |
 | `fsck` | ⬜ | `-a`, `-A`, `-C`, `-f`, `-M`, `-N`, `-P`, `-r`, `-R`, `-T`, `-V`, `-y` | JSON: `--json` |
-| `fsck.ext4` | ⬜ | `-b`, `-c`, `-f`, `-p`, `-y`, `-n`, `-v` | |
-| `mkfs` | ⬜ | `-t`, `-c`, `-v`, `-n` | Rustux: `mkfs.fat` and `mkfs.ext2` instead (below) |
+| `fsck.ext4` | ⚠️ | `-b`, `-c`, `-f`, `-p`, `-y`, `-n`, `-v` | Rustux: `fsck.ext2` under this name (step 16); replays the journal (`-a`/`-p`/`-y`), then checks (passes, extents, checksums); `-a` corrects the free counts; no `-b`, `-c`, other repairs |
+| `mkfs` | ⬜ | `-t`, `-c`, `-v`, `-n` | Rustux: `mkfs.fat`, `mkfs.ext2` and `mkfs.ext4` instead (below) |
 | `mkfs.ext2` / `mke2fs` | ⚠️ | `-b`, `-i`, `-L`, `-U`, `-m`, `-I` | Rustux: C program (step 15); ext2 as Linux's mke2fs makes it (without the resize inode); no `-t`, `-O`, `-N`, `-d` |
-| `fsck.ext2` | ⚠️ | `-a`, `-n`, `-v` | Rustux: C program (step 15); checks only (e2fsck's five passes); `-a` corrects the free counts |
+| `fsck.ext2` / `fsck.ext3` | ⚠️ | `-a`, `-n`, `-v` | Rustux: C program (steps 15, 16); checks ext2/3/4 (e2fsck's five passes, extents, checksums), replays the journal; `-a` corrects the free counts |
 | `mkfs.fat` / `mkfs.vfat` | ✅ | `-F`, `-n`, `-i`, `-s`, `-I` | Rustux: C program (step 14); FAT12/16/32, type and cluster size by size as Windows formats |
 | `fsck.fat` / `fsck.vfat` | ⚠️ | `-a`, `-n`, `-v` | Rustux: C program (step 14); checks only; `-a` corrects the FSInfo free count |
-| `mkfs.ext4` | ⬜ | `-b`, `-F`, `-E`, `-I`, `-J`, `-L`, `-m`, `-n`, `-q` | |
+| `mkfs.ext4` | ⚠️ | `-b`, `-F`, `-E`, `-I`, `-J`, `-L`, `-m`, `-n`, `-q` | Rustux: C program (step 16); Linux's ext4 defaults (without the resize inode), `-b`, `-i`, `-J size=`, `-L`, `-U`, `-m`, `-O ^has_journal`, `-I` (whole disk), `-F`/`-q` accepted; no `-E`, `-n` |
 | `mkswap` | ⬜ | `-f`, `-p`, `-U`, `-L` | |
 | `swapon` | ⬜ | `-a`, `-d`, `-e`, `-f`, `-p`, `-s`, `-U`, `-v` | JSON: `--json` |
 | `swapoff` | ⬜ | `-a`, `-v` | |
-| `tune2fs` | ⬜ | `-l`, `-L`, `-U`, `-c`, `-i`, `-j`, `-m`, `-o`, `-r` | JSON: `-l` |
+| `tune2fs` | ⚠️ | `-l`, `-L`, `-U`, `-c`, `-i`, `-j`, `-m`, `-o`, `-r` | JSON: `-l`. Rustux: C program (step 16); `-l` as Linux's, `-L`; no other changes yet |
 | `resize2fs` | ⬜ | `-f`, `-F`, `-M`, `-p`, `-P`, `-s` | |
 | `mountpoint` | ⬜ | `-q`, `-d`, `-x` | JSON: `--json` |
 | `losetup` | ⬜ | `-a`, `-d`, `-f`, `-j`, `-n`, `-o`, `-P`, `--show`, `-v` | JSON: `-J` |

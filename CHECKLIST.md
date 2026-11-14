@@ -486,6 +486,8 @@ Only the Debian/Ubuntu package tools are renamed; every other command keeps its 
 | Command | Status | Key Flags | Notes |
 |---------|--------|-----------|-------|
 | `systemctl` | ⚠️ | `start`, `stop`, `restart`, `reload`, `status`, `enable`, `disable`, `is-enabled`, `is-active`, `list-units`, `list-unit-files`, `daemon-reload`, `show`, `cat`, `set-property`, `reset-failed`, `list-jobs`, `list-timers`, `list-sockets` | JSON: `--output=json`. Rustux: `svc` (C program, step 18; systemctl is another name for it), units in `/etc/svc`: all but `set-property`, `list-jobs`, `list-timers`, `list-sockets`; also `isolate`, `is-failed`, `get-default`, `poweroff`, `reboot`; `reload UNIT` restarts it; `--json` |
+| `bootctl` | ⚠️ | `status`, `list`, `set-default`, `set-oneshot`, `set-timeout`, `reboot-to-firmware`, `install`, `update`, `remove`, `is-installed`, `--esp-path` | JSON: `--json=`. Rustux: C program (step 19) for the boot manager rboot: all but `install`, `update`, `remove` (step 20); no JSON |
+| `efibootmgr` | ⚠️ | `-v`, `-o`, `-n`, `-N`, `-b`, `-B`, `-a`, `-A`, `-c`, `-d`, `-p`, `-l`, `-L`, `-t`, `-T`, `-q` | Rustux: C program (step 19): all of these; no `-r`, `-e`, `-@`, `-u` |
 | `systemd-analyze` | ⬜ | `time`, `blame`, `critical-chain`, `dot`, `dump`, `set-log-level`, `get-log-level`, `verify`, `calendar`, `unit-files`, `unit-paths`, `exit-statuses` | JSON: `--json=` |
 | `systemd-cgtop` | ⬜ | `-p`, `-k`, `-K`, `-t`, `-m`, `--batch` | |
 | `systemd-resolve` | ⬜ | `status`, `query`, `service`, `openpgp`, `statistics`, `reset-statistics`, `flush-caches` | JSON: `--json=` |

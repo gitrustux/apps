@@ -473,8 +473,8 @@ Only the Debian/Ubuntu package tools are renamed; every other command keeps its 
 | Command | Status | Key Flags | Notes |
 |---------|--------|-----------|-------|
 | `dmesg` | ⚠️ | `-c`, `-C`, `-T`, `-D`, `-E`, `-f`, `-H`, `-k`, `-l`, `-n`, `-r`, `-s`, `-t`, `-w`, `-x`, `-P`, `--level`, `--facility`, `--human`, `--raw` | JSON: `--json`. Rustux: C program; prints the kernel log; no flags yet |
-| `journalctl` | ⬜ | `-b`, `-f`, `-k`, `-u`, `-r`, `-n`, `-o`, `-a`, `-c`, `--since`, `--until`, `--follow`, `--rotate`, `-vacuum`, `-S`, `-D`, `--user`, `--disk-usage` | JSON: `-o json` |
-| `logger` | ⬜ | `-i`, `-f`, `-p`, `-s`, `-t`, `-u`, `--journald`, `--id` | |
+| `journalctl` | ⚠️ | `-b`, `-f`, `-k`, `-u`, `-r`, `-n`, `-o`, `-a`, `-c`, `--since`, `--until`, `--follow`, `--rotate`, `-vacuum`, `-S`, `-D`, `--user`, `--disk-usage` | JSON: `-o json`. Rustux: `logs` (C program, step 18; journalctl is another name for it): `-u -t -k -b [N] -p -g -S -U -n -r -f -o short/short-iso/json/cat --list-boots --disk-usage`; no `-c`, `--rotate`, `--vacuum`, `-D`, `--user` |
+| `logger` | ⚠️ | `-i`, `-f`, `-p`, `-s`, `-t`, `-u`, `--journald`, `--id` | Rustux: C program (step 18), to logd; `-t -p -s -f -i`; no `-u`, `--journald` |
 | `strace` | ⬜ | `-p`, `-f`, `-ff`, `-o`, `-e`, `-s`, `-v`, `-yy`, `-E`, `-c`, `-C` | JSON: `-f -o strace.log` (parseable) |
 | `ltrace` | ⬜ | `-c`, `-C`, `-d`, `-e`, `-f`, `-l`, `-n`, `-o`, `-p`, `-s`, `-S`, `-t`, `-x` | |
 | `perf` | ⬜ | `record`, `report`, `stat`, `top`, `list`, `script`, `trace`, `kmem`, `lock` | JSON: `report --stdio` (json events) |
@@ -485,7 +485,7 @@ Only the Debian/Ubuntu package tools are renamed; every other command keeps its 
 
 | Command | Status | Key Flags | Notes |
 |---------|--------|-----------|-------|
-| `systemctl` | ⬜ | `start`, `stop`, `restart`, `reload`, `status`, `enable`, `disable`, `is-enabled`, `is-active`, `list-units`, `list-unit-files`, `daemon-reload`, `show`, `cat`, `set-property`, `reset-failed`, `list-jobs`, `list-timers`, `list-sockets` | JSON: `--output=json` |
+| `systemctl` | ⚠️ | `start`, `stop`, `restart`, `reload`, `status`, `enable`, `disable`, `is-enabled`, `is-active`, `list-units`, `list-unit-files`, `daemon-reload`, `show`, `cat`, `set-property`, `reset-failed`, `list-jobs`, `list-timers`, `list-sockets` | JSON: `--output=json`. Rustux: `svc` (C program, step 18; systemctl is another name for it), units in `/etc/svc`: all but `set-property`, `list-jobs`, `list-timers`, `list-sockets`; also `isolate`, `is-failed`, `get-default`, `poweroff`, `reboot`; `reload UNIT` restarts it; `--json` |
 | `systemd-analyze` | ⬜ | `time`, `blame`, `critical-chain`, `dot`, `dump`, `set-log-level`, `get-log-level`, `verify`, `calendar`, `unit-files`, `unit-paths`, `exit-statuses` | JSON: `--json=` |
 | `systemd-cgtop` | ⬜ | `-p`, `-k`, `-K`, `-t`, `-m`, `--batch` | |
 | `systemd-resolve` | ⬜ | `status`, `query`, `service`, `openpgp`, `statistics`, `reset-statistics`, `flush-caches` | JSON: `--json=` |

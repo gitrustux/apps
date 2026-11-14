@@ -349,21 +349,21 @@ Only the Debian/Ubuntu package tools are renamed; every other command keeps its 
 
 | Command | Status | Key Flags | Notes |
 |---------|--------|-----------|-------|
-| `login` | ⬜ | `-f`, `-h`, `-p` | |
+| `login` | ⚠️ | `-f`, `-h`, `-p` | Rustux: C program (step 17); init runs it on the console; `-f USER` (autologin); no `-h`, `-p` |
 | `logout` | ⬜ | | |
-| `whoami` | ⚠️ | | JSON: `--json`. Rustux: uutils coreutils; GNU text output, no JSON yet |
-| `id` | ⚠️ | `-u`, `-g`, `-G`, `-n`, `-r`, `-z` | JSON: `--json`. Rustux: uutils coreutils; GNU text output, no JSON yet |
-| `groups` | ⬜ | | JSON: `--json` |
-| `passwd` | ⬜ | `-d`, `-e`, `-i`, `-k`, `-l`, `-n`, `-S`, `-u`, `-w` | JSON: `-S` |
+| `whoami` | ⚠️ | | JSON: `--json`. Rustux: uutils coreutils (real users since step 17); GNU text output, no JSON yet |
+| `id` | ⚠️ | `-u`, `-g`, `-G`, `-n`, `-r`, `-z` | JSON: `--json`. Rustux: uutils coreutils (the kernel's credentials since step 17); GNU text output, no JSON yet |
+| `groups` | ⚠️ | | JSON: `--json`. Rustux: uutils coreutils (step 17); no JSON yet |
+| `passwd` | ⚠️ | `-d`, `-e`, `-i`, `-k`, `-l`, `-n`, `-S`, `-u`, `-w` | JSON: `-S`. Rustux: C program (step 17), through authd; `passwd [USER]` only (lock with `usermod -L`) |
 | `chsh` | ⬜ | `-s`, `-l` | |
-| `su` | ⬜ | `-`, `-c`, `-s`, `-l`, `-m` | |
-| `sudo` | ⬜ | `-i`, `-u`, `-s`, `-H`, `-E`, `-v` | JSON: `--json` (validate) |
+| `su` | ⚠️ | `-`, `-c`, `-s`, `-l`, `-m` | Rustux: C program (step 17), through authd; `-`, `-l`, `-c`; no `-s`, `-m` |
+| `sudo` | ⚠️ | `-i`, `-u`, `-s`, `-H`, `-E`, `-v` | JSON: `--json` (validate). Rustux: C program (step 17), through authd; `/etc/sudoers` (users, `%group`, RUNAS, `NOPASSWD:`); `-u`, `-i`, `-s`, `-S`, `-l`; no `-H`, `-E`, `-v`, `-k` |
 | `newgrp` | ⬜ | | |
-| `useradd` | ⬜ | `-m`, `-s`, `-d`, `-g`, `-G`, `-u`, `-k`, `-b` | JSON: `--json` |
-| `userdel` | ⬜ | `-r`, `-f` | |
-| `usermod` | ⬜ | `-a`, `-G`, `-l`, `-s`, `-d`, `-m`, `-u`, `-L`, `-U` | |
-| `groupadd` | ⬜ | `-g`, `-o`, `-r`, `-f` | JSON: `--json` |
-| `groupdel` | ⬜ | | |
+| `useradd` | ⚠️ | `-m`, `-s`, `-d`, `-g`, `-G`, `-u`, `-k`, `-b` | JSON: `--json`. Rustux: C program (step 17); `-m -s -d -g -G -u -c` (skel: `/etc/skel`); no `-k`, `-b`, JSON |
+| `userdel` | ⚠️ | `-r`, `-f` | Rustux: C program (step 17); `-r`; no `-f` |
+| `usermod` | ⚠️ | `-a`, `-G`, `-l`, `-s`, `-d`, `-m`, `-u`, `-L`, `-U` | Rustux: C program (step 17); `-a -G -g -s -d -c -L -U`; no `-l`, `-m`, `-u` |
+| `groupadd` | ⚠️ | `-g`, `-o`, `-r`, `-f` | JSON: `--json`. Rustux: C program (step 17); `-g`; no `-o`, `-r`, `-f` |
+| `groupdel` | ✅ | | Rustux: C program (step 17); not a user's primary group |
 | `groupmod` | ⬜ | `-g`, `-o`, `-n` | |
 | `faillog` | ⬜ | `-a`, `-l`, `-m`, `-r`, `-u` | JSON: `--json` |
 | `last` | ⬜ | `-n`, `-a`, `-d`, `-F` | JSON: `--format=json` |
@@ -433,9 +433,9 @@ Only the Debian/Ubuntu package tools are renamed; every other command keeps its 
 
 | Command | Status | Key Flags | Notes |
 |---------|--------|-----------|-------|
-| `reboot` | ⚠️ | `-f`, `-p`, `-w` | Rustux: C program (ACPI reset); no flags yet |
+| `reboot` | ⚠️ | `-f`, `-p`, `-w` | Rustux: C program (ACPI reset); root (or sudo): init ends the session and writes the disks out first (step 17); no flags yet |
 | `shutdown` | ⬜ | `-h`, `-P`, `-H`, `-r`, `-k`, `-c`, `-t`, `-a`, `--no-wall` | |
-| `poweroff` | ⚠️ | `-f`, `-w`, `-p` | Rustux: C program (ACPI S5); no flags yet |
+| `poweroff` | ⚠️ | `-f`, `-w`, `-p` | Rustux: C program (ACPI S5); root (or sudo): init ends the session and writes the disks out first (step 17); no flags yet |
 | `halt` | ⬜ | `-f`, `-p`, `-w` | |
 | `wall` | ⬜ | `-n`, `-t`, `-g`, `-G` | |
 | `write` | ⬜ | | |
@@ -492,8 +492,8 @@ Only the Debian/Ubuntu package tools are renamed; every other command keeps its 
 | `systemd-mount` | ⬜ | | |
 | `systemd-escape` | ⬜ | `-m`, `-s`, `-p` | |
 | `loginctl` | ⬜ | `list-sessions`, `list-users`, `list-seats`, `show-session`, `show-user`, `show-seat`, `activate`, `lock-session`, `unlock-session`, `terminate-session` | JSON: `--output=json` |
-| `timedatectl` | ⬜ | `status`, `set-time`, `set-timezone`, `list-timezones`, `set-ntp`, `set-local-rtc` | JSON: `--json=` |
-| `localectl` | ⬜ | `status`, `set-locale`, `list-locales`, `set-keymap`, `list-keymaps`, `set-x11-keymap`, `list-x11-keymap-models` | JSON: `--json=` |
+| `timedatectl` | ⚠️ | `status`, `set-time`, `set-timezone`, `list-timezones`, `set-ntp`, `set-local-rtc` | JSON: `--json=`. Rustux: C program (step 17); all but `set-ntp` (no network); no JSON |
+| `localectl` | ⚠️ | `status`, `set-locale`, `list-locales`, `set-keymap`, `list-keymaps`, `set-x11-keymap`, `list-x11-keymap-models` | JSON: `--json=`. Rustux: C program (step 17); `status`, `set-keymap`, `list-keymaps` (locale is C.UTF-8) |
 | `hwclock` | ⬜ | `-r`, `-w`, `-s`, `--show`, `--hctosys`, `--systohc`, `--adjust`, `--getepoch`, `--setepoch`, `--noadjfile`, `--adjfile` | JSON: `--json` |
 
 ---
@@ -547,8 +547,8 @@ Only the Debian/Ubuntu package tools are renamed; every other command keeps its 
 | Command | Status | Key Flags | Notes |
 |---------|--------|-----------|-------|
 | `chmod` | ✅ | `-c`, `-f`, `-v`, `-R`, `--reference`, `--changes`, `--no-preserve-root`, `--preserve-root` | JSON: `--changes`. Rustux: uutils coreutils; modes are stored, not enforced until users exist (step 17) |
-| `chown` | ⬜ | `-c`, `-f`, `-h`, `-R`, `-v`, `--from`, `--reference`, `--changes` | JSON: `--changes` |
-| `chgrp` | ⬜ | `-c`, `-f`, `-h`, `-R`, `-v`, `--reference`, `--changes` | JSON: `--changes` |
+| `chown` | ⚠️ | `-c`, `-f`, `-h`, `-R`, `-v`, `--from`, `--reference`, `--changes` | JSON: `--changes`. Rustux: uutils coreutils (step 17); GNU text output, no JSON |
+| `chgrp` | ⚠️ | `-c`, `-f`, `-h`, `-R`, `-v`, `--reference`, `--changes` | JSON: `--changes`. Rustux: uutils coreutils (step 17); GNU text output, no JSON |
 | `getfacl` | ⬜ | `-a`, `-d`, `-R`, `-p`, `-n`, `--access`, `--default`, `--no-effective`, `--skip-base`, `--all-effective`, `--set`, `--set-file`, `--mask` | JSON: `--no-effective` |
 | `setfacl` | ⬜ | `-R`, `-b`, `-k`, `-n`, `-d`, `-m`, `-M`, `-x`, `-X`, `--restore`, `--set`, `--set-file`, `--mask` | |
 | `umask` | ⚠️ | `-S`, `-p` | Rustux: shell built-in; `-S` |

@@ -1,5 +1,7 @@
 # Phase 9.1: Package Manager Integration (rustica-store)
 
+> **Superseded (2026-11-16)** by the FoxDen plan (`FOXDEN.md` in the Rustux project) and the package plan (`PACKAGES.md`, one tool `rpg`). Kept for reference only.
+
 ## Overview
 
 **Component**: rustica-store

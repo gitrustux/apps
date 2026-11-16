@@ -1,5 +1,7 @@
 # Application Library (rustica-applibrary) Specification
 
+> **Superseded (2026-11-16)** by the FoxDen plan (`FOXDEN.md` in the Rustux project): Rustica's app store is FoxDen, apps are `.rpg` packages from `https://rustux.com/download/apps`, sandboxed in `/apps/ID`. This document is kept for its ideas (categories, the app page, updates) only; its code and Flatpak support are not used.
+
 **Date**: 2025-01-07
 **Status**: ✅ **APPROVED**
 **Component**: Rustica Shell - Application Library

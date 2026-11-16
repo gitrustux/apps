@@ -50,12 +50,25 @@ Package files are `.rpg`. One repository for every edition: `https://rustux.com/
 | `rpg fix` | ⬜ | | Finishes or undoes an interrupted install; dpkg --configure -a, apt --fix-broken |
 | `rpg info ./FILE.rpg` | ⬜ | | A package file's control and files; dpkg-deb -I / -c |
 
-### 1.3 Making packages and repositories (the publishing side)
+### 1.3 Apps (FoxDen, the app store)
+
+Apps are kept apart from the system: `.rpg` packages of their own kind from `https://rustux.com/download/apps`, installed into `/apps/ID` and run in a sandbox (the plan is `FOXDEN.md` in the Rustux project). The same `rpg`, an app named by its ID.
+
+| Command | Status | Key Flags | Notes |
+|---------|--------|-----------|-------|
+| `rpg install ID` | ⬜ | `-y` | An app, `rpg install org.rustica.calculator`; no administrator needed for a sandboxed app |
+| `rpg remove ID` | ⬜ | `--purge` | The app's folder; `--purge`: the users' data for it too |
+| `rpg list --apps` | ⬜ | | Installed apps. JSON: `--json` |
+| `rpg permissions ID` | ⬜ | `grant PERMISSION`, `revoke PERMISSION` | `network`, `files:documents`, ... |
+| `appctl run ID` | ⬜ | | Starts an app in its sandbox (the launcher uses it) |
+| `foxden [ID]` | ⬜ | | The app store (graphical); an app's page |
+
+### 1.4 Making packages and repositories (the publishing side)
 
 | Command | Status | Key Flags | Notes |
 |---------|--------|-----------|-------|
 | `rpg build DIR` | ⬜ | `-o FILE` | A `.rpg` from a `control` file and a tree; dpkg-deb --build |
-| `rpg index DIR` | ⬜ | | `Packages.gz` and `Release` for a folder of packages; apt-ftparchive. Signing is separate: `openssl pkeyutl -sign -rawin` with the archive key |
+| `rpg index DIR` | ⬜ | `--apps` | `Packages.gz` and `Release` for a folder of packages (`--apps`: FoxDen's `Apps.json.gz` with the store metadata); apt-ftparchive. Signing is separate: `openssl pkeyutl -sign -rawin` with the archive key |
 
 ---
 

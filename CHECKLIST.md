@@ -6,205 +6,56 @@
 
 ## Naming Rules
 
-Only the Debian/Ubuntu package tools are renamed; every other command keeps its familiar name (`ls`, `grep`, `ip`, `systemctl`, `tar`, ...).
+Every command keeps its familiar name (`ls`, `grep`, `ip`, `systemctl`, `tar`, ...) but the package tools: Debian's two layers (dpkg under apt) and their families of commands are replaced by **one tool, `rpg`**, with subcommands (decided 2026-11-16; the plan is `PACKAGES.md` in the Rustux project, phase E). There is no `app`, `app-get`, `app-cache`, `app-key`, `applicate`, `rpg-deb`, `rpg-query`, ...
 
 | Ubuntu | Rustica |
 |--------|---------|
-| `apt`, `apt-get`, `apt-cache`, `apt-key`, `apt-add-repository`, `apt-mark`, `apt-config`, `apt-listchanges` | `app`, `app-get`, `app-cache`, `app-key`, `app-add-repository`, `app-mark`, `app-config`, `app-listchanges` |
-| `aptitude` | `applicate` |
-| `dpkg`, `dpkg-deb`, `dpkg-query`, `dpkg-reconfigure`, `dpkg-divert` | `rpg`, `rpg-deb`, `rpg-query`, `rpg-reconfigure`, `rpg-divert` |
+| `apt`, `apt-get`, `apt-cache`, `apt-mark`, `apt-key`, `add-apt-repository`, `aptitude` | `rpg` and its subcommands (below) |
+| `dpkg`, `dpkg-deb`, `dpkg-query` | `rpg` and its subcommands (below) |
+
+Package files are `.rpg`. One repository for every edition: `https://rustux.com/download/rustica` (suite `redfox`, section `main`); retired releases move to `https://archive.rustux.com/download/rustica`. Indexes are signed with Ed25519 (the archive key `rustux-archive-2026`).
 
 ---
 
-## 1. Package Management (`app` / `rpg`)
+## 1. Package Management (`rpg`)
 
-### 1.1 `app` (apt replacement)
-
-| Command | Status | Key Flags | Notes |
-|---------|--------|-----------|-------|
-| `app install` | ⬜ | `-y`, `--assume-yes`, `--download-only`, `--fix-broken` | Install packages |
-| `app remove` | ⬜ | `-y`, `--purge`, `--auto-remove` | Remove packages |
-| `app update` | ⬜ | | Update package lists |
-| `app upgrade` | ⬜ | `-y`, `--with-new-pkgs`, `--auto-remove` | Upgrade packages |
-| `app full-upgrade` | ⬜ | `-y` | Full distribution upgrade |
-| `app search` | ⬜ | `--names-only`, `--full`, `--installed` | Search packages |
-| `app show` | ⬜ | `-a`, `--all-versions` | Show package details |
-| `app list` | ⬜ | `--installed`, `--upgradable`, `--all-versions` | List packages (JSON default) |
-| `app autoremove` | ⬜ | `-y` | Remove unused packages |
-| `app clean` | ⬜ | | Clear package cache |
-| `app autoclean` | ⬜ | | Clean obsolete packages |
-| `app source` | ⬜ | `--download-only`, `--compile` | Download source |
-| `app policy` | ⬜ | | Show package policy |
-| `app depends` | ⬜ | `--installed`, `--pre-depends` | Show dependencies |
-| `app rdepends` | ⬜ | `--installed`, `--recurse` | Show reverse dependencies |
-| `app edit-sources` | ⬜ | | Edit sources list |
-| `app changelog` | ⬜ | | Show package changelog |
-
-### 1.2 `app-get` (apt-get wrapper)
+### 1.1 Repositories and updates (apt's part)
 
 | Command | Status | Key Flags | Notes |
 |---------|--------|-----------|-------|
-| `app-get install` | ⬜ | `-y`, `-d`, `-f` | |
-| `app-get update` | ⬜ | | |
-| `app-get upgrade` | ⬜ | `-y`, `-u` | |
-| `app-get dist-upgrade` | ⬜ | `-y` | |
-| `app-get remove` | ⬜ | `-y`, `--purge` | |
-| `app-get autoremove` | ⬜ | `-y` | |
-| `app-get clean` | ⬜ | | |
-| `app-get source` | ⬜ | `-b`, `-d` | |
-| `app-get download` | ⬜ | | |
-| `app-get check` | ⬜ | | |
-| `app-get -m --print-uris` | ⬜ | | Print URIs only |
+| `rpg update` | ⬜ | | The sources' `Release` (signature checked) and indexes; apt update |
+| `rpg upgrade` | ⬜ | `-y`, `--download-only` | Every upgradable package, new dependencies included; apt upgrade and full-upgrade |
+| `rpg install NAME...` | ⬜ | `-y`, `--download-only`, `--no-recommends` | With dependencies; apt install |
+| `rpg install ./FILE.rpg` | ⬜ | `-y` | A package file; dpkg -i |
+| `rpg remove NAME...` | ⬜ | `-y`, `--purge` | apt remove / purge |
+| `rpg autoremove` | ⬜ | `-y` | Dependencies no longer needed |
+| `rpg search TEXT` | ⬜ | `--names-only`, `--installed` | apt search. JSON: `--json` |
+| `rpg show NAME` | ⬜ | | apt show. JSON: `--json` |
+| `rpg policy NAME` | ⬜ | | Installed and candidate versions, from which source; apt-cache policy |
+| `rpg list` | ⬜ | `--installed`, `--upgradable`, `--held` | apt list. JSON: `--json` |
+| `rpg depends NAME`, `rpg rdepends NAME` | ⬜ | | apt-cache depends / rdepends |
+| `rpg hold NAME`, `rpg unhold NAME` | ⬜ | | apt-mark hold |
+| `rpg source list`, `rpg source add LINE`, `rpg source remove N` | ⬜ | | `/etc/rpg/sources.list`; add-apt-repository |
+| `rpg key list`, `rpg key add FILE`, `rpg key remove ID` | ⬜ | | `/etc/rpg/keys/`; apt-key |
+| `rpg download NAME` | ⬜ | | Into the current folder; apt download |
+| `rpg clean` | ⬜ | | `/var/cache/rpg/archives/`; apt clean |
 
-### 1.3 `app-cache` (apt-cache replacement)
-
-| Command | Status | Key Flags | Notes |
-|---------|--------|-----------|-------|
-| `app-cache search` | ⬜ | `--names-only`, `--full` | |
-| `app-cache show` | ⬜ | `-a`, `--all-versions` | |
-| `app-cache policy` | ⬜ | | |
-| `app-cache depends` | ⬜ | `--installed`, `--pre-depends` | |
-| `app-cache rdepends` | ⬜ | | |
-| `app-cache pkgnames` | ⬜ | | |
-| `app-cache stats` | ⬜ | | JSON format |
-| `app-cache dump` | ⬜ | | |
-| `app-cache dumpavail` | ⬜ | | |
-| `app-cache unmet` | ⬜ | | |
-| `app-cache showsrc` | ⬜ | | |
-| `app-cache madison` | ⬜ | | |
-
-### 1.4 `app-key` (apt-key replacement)
+### 1.2 Installed packages (dpkg's part)
 
 | Command | Status | Key Flags | Notes |
 |---------|--------|-----------|-------|
-| `app-key add` | ⬜ | | Add key |
-| `app-key del` | ⬜ | | Delete key |
-| `app-key list` | ⬜ | | List keys (JSON default) |
-| `app-key finger` | ⬜ | | Show fingerprint |
-| `app-key export` | ⬜ | | Export key |
-| `app-key adv` | ⬜ | | Advanced operations |
-| `app-key update` | ⬜ | | Update keys |
-| `app-key net-update` | ⬜ | | Update from network |
+| `rpg files NAME` | ⬜ | | The files a package installed; dpkg -L |
+| `rpg owner PATH` | ⬜ | | Which package a file belongs to; dpkg -S |
+| `rpg verify [NAME]` | ⬜ | | Files changed or missing (SHA-256); dpkg -V |
+| `rpg fix` | ⬜ | | Finishes or undoes an interrupted install; dpkg --configure -a, apt --fix-broken |
+| `rpg info ./FILE.rpg` | ⬜ | | A package file's control and files; dpkg-deb -I / -c |
 
-### 1.5 `applicate` (aptitude replacement)
+### 1.3 Making packages and repositories (the publishing side)
 
 | Command | Status | Key Flags | Notes |
 |---------|--------|-----------|-------|
-| `applicate install` | ⬜ | `-y`, `-P` | |
-| `applicate remove` | ⬜ | `-y`, `-P` | |
-| `applicate update` | ⬜ | | |
-| `applicate upgrade` | ⬜ | `-y`, `--safe-upgrade` | |
-| `appposite full-upgrade` | ⬜ | `-y` | |
-| `applicate search` | ⬜ | `--disable-columns`, `-F` | |
-| `applicate show` | ⬜ | | |
-| `applicate clean` | ⬜ | | |
-| `applicate why` | ⬜ | `--explain` | |
-| `applicate why-not` | ⬜ | | |
-| `appitate holds` | ⬜ | | Show held packages |
-
-### 1.6 `app-add-repository`
-
-| Command | Status | Key Flags | Notes |
-|---------|--------|-----------|-------|
-| `app-add-repository` | ⬜ | `-r`, `-y`, `-n` | Add PPA/repo |
-| `app-add-repository -r` | ⬜ | | Remove repository |
-
-### 1.7 `app-mark` (apt-mark replacement)
-
-| Command | Status | Key Flags | Notes |
-|---------|--------|-----------|-------|
-| `app-mark auto` | ⬜ | | Mark as auto |
-| `app-mark manual` | ⬜ | | Mark as manual |
-| `app-mark hold` | ⬜ | | Hold package |
-| `app-mark unhold` | ⬜ | | Unhold package |
-| `app-mark showhold` | ⬜ | | Show held (JSON) |
-| `app-mark showauto` | ⬜ | | Show auto (JSON) |
-| `app-mark showmanual` | ⬜ | | Show manual (JSON) |
-
-### 1.8 `app-config` (apt-config replacement)
-
-| Command | Status | Key Flags | Notes |
-|---------|--------|-----------|-------|
-| `app-config dump` | ⬜ | `--format=%s` | Dump config (JSON default) |
-| `app-config shell` | ⬜ | | Shell mode |
-| `app-config set` | ⬜ | | Set option |
-| `app-status` | ⬜ | | Show status |
-
-### 1.9 `app-listchanges`
-
-| Command | Status | Key Flags | Notes |
-|---------|--------|-----------|-------|
-| `app-listchanges` | ⬜ | `--since`, `--show-all` | Show changelog news |
-
-### 1.10 `rpg` (dpkg replacement)
-
-| Command | Status | Key Flags | Notes |
-|---------|--------|-----------|-------|
-| `rpg -i` / `rpg --install` | ⬜ | `--force-confold`, `--force-confnew` | Install .deb |
-| `rpg -r` / `rpg --remove` | ⬜ | `--purge` | Remove package |
-| `rpg -P` / `rpg --purge` | ⬜ | | Purge package |
-| `rpg -l` / `rpg --list` | ⬜ | | List files in package (JSON) |
-| `rpg -L` / `rpg --listfiles` | ⬜ | | List files owned by pkg |
-| `rpg -S` / `rpg --search` | ⬜ | | Search for file (JSON) |
-| `rpg -s` / `rpg --status` | ⬜ | | Show package status (JSON) |
-| `rpg -p` / `rpg --print-avail` | ⬜ | | Show available (JSON) |
-| `rpg -C` / `rpg --audit` | ⬜ | | Audit broken packages |
-| `rpg --get-selections` | ⬜ | | Get selections (JSON) |
-| `rpg --set-selections` | ⬜ | | Set selections |
-| `rpg --clear-selections` | ⬜ | | Clear selections |
-| `rpg -V` / `rpg --version` | ⬜ | | Show version (JSON: `--format=json`) |
-| `rpg --verify` | ⬜ | | Verify package |
-| `rpg --configure` | ⬜ | | Configure package |
-| `rpg --triggers-only` | ⬜ | | Process triggers |
-| `rpg --force-depends` | ⬜ | | Force depends |
-| `rpg --ignore-depends` | ⬜ | | Ignore depends |
-| `rpg --force-downgrade` | ⬜ | | Allow downgrade |
-| `rpg -i` (info) | ⬜ | | Show package info |
-
-### 1.11 `rpg-deb` (dpkg-deb replacement)
-
-| Command | Status | Key Flags | Notes |
-|---------|--------|-----------|-------|
-| `rpg-deb -c` / `--contents` | ⬜ | | List contents (JSON) |
-| `rpg-deb -f` / `--field` | ⬜ | | Show field |
-| `rpg-deb -W` / `--show` | ⬜ | | Show info (JSON) |
-| `rpg-deb -e` / `--control` | ⬜ | | Extract control |
-| `rpg-deb -x` / `--extract` | ⬜ | | Extract files |
-| `rpg-deb -X` / `--vextract` | ⬜ | | Extract verbose |
-| `rpg-deb -R` / `--raw-extract` | ⬜ | | Raw extract |
-| `rpg-deb -I` / `--info` | ⬜ | | Show info |
-| `rpg-deb -b` / `--build` | ⬜ | | Build .deb |
-| `rpg-deb --contents` | ⬜ | | |
-| `rpg-deb -f` | ⬜ | | Show field |
-
-### 1.12 `rpg-query` (dpkg-query replacement)
-
-| Command | Status | Key Flags | Notes |
-|---------|--------|-----------|-------|
-| `rpg-query -l` / `--list` | ⬜ | `--format=${Package}` | List packages (JSON default) |
-| `rpg-query -W` / `--show` | ⬜ | `--showformat`, `-f` | Show info (JSON default) |
-| `rpg-query -S` / `--search` | ⬜ | | Search for file (JSON) |
-| `rpg-query -s` / `--status` | ⬜ | | Show status |
-| `rpg-query -L` / `--listfiles` | ⬜ | | List files (JSON) |
-| `rpg-query -p` / `--print-avail` | ⬜ | | Show available |
-| `rpg-query -C` / `--audit` | ⬜ | | Audit (JSON) |
-| `rpg-query --compare-versions` | ⬜ | | Compare versions |
-
-### 1.13 `rpg-reconfigure`
-
-| Command | Status | Key Flags | Notes |
-|---------|--------|-----------|-------|
-| `rpg-reconfigure` | ⬜ | `-p`, `--priority` | Reconfigure package |
-
-### 1.14 `rpg-divert` (dpkg-divert replacement)
-
-| Command | Status | Key Flags | Notes |
-|---------|--------|-----------|-------|
-| `rpg-divert --add` | ⬜ | `--local`, `--rename` | Add diversion |
-| `rpg-divert --remove` | ⬜ | | Remove diversion |
-| `rpg-divert --list` | ⬜ | | List diversions (JSON) |
-| `rpg-divert --truename` | ⬜ | | Show true name |
-| `rpg-divert --query` | ⬜ | | Query diversion |
+| `rpg build DIR` | ⬜ | `-o FILE` | A `.rpg` from a `control` file and a tree; dpkg-deb --build |
+| `rpg index DIR` | ⬜ | | `Packages.gz` and `Release` for a folder of packages; apt-ftparchive. Signing is separate: `openssl pkeyutl -sign -rawin` with the archive key |
 
 ---
 
@@ -309,13 +160,13 @@ Only the Debian/Ubuntu package tools are renamed; every other command keeps its 
 
 | Command | Status | Key Flags | Notes |
 |---------|--------|-----------|-------|
-| `ip` | ⬜ | `address`, `route`, `link`, `netns`, `neigh`, `rule` | JSON: `-j` / `-json` |
-| `ip addr` | ⬜ | `add`, `del`, `show`, `-a`, `-dev` | JSON: `-j` |
-| `ip route` | ⬜ | `add`, `del`, `show`, `get`, `replace` | JSON: `-j` |
-| `ip link` | ⬜ | `set`, `show`, `up`, `down`, `-name` | JSON: `-j` |
+| `ip` | ⚠️ | `address`, `route`, `link`, `netns`, `neigh`, `rule` | JSON: `-j` / `-json`. Rustux: C program (step D1, D4); `addr`, `route`, `link`, `-4`/`-6`, `-s`, `-br`; no `netns`, `neigh`, `rule`, no JSON |
+| `ip addr` | ✅ | `add`, `del`, `show`, `-a`, `-dev` | JSON: `-j`. Rustux: `add`, `del`, `show [IF]` (root changes); no JSON |
+| `ip route` | ⚠️ | `add`, `del`, `show`, `get`, `replace` | JSON: `-j`. Rustux: `show`, `add`/`del default via`; no `get`, `replace`, other routes; no JSON |
+| `ip link` | ✅ | `set`, `show`, `up`, `down`, `-name` | JSON: `-j`. Rustux: `show`, `set IF up`/`down`; no JSON |
 | `ip neigh` | ⬜ | `show`, `flush`, `add`, `del`, `replace` | JSON: `-j` |
-| `ss` | ⬜ | `-t`, `-u`, `-w`, `-x`, `-a`, `-l`, `-p`, `-n`, `-m`, `-o`, `-i`, `-s`, `-4`, `-6`, `-Z` | JSON: `-j` / `-H` |
-| `ping` | ⬜ | `-c`, `-i`, `-W`, `-s`, `-t`, `-4`, `-6`, `-O` | JSON: `-O` (summary) |
+| `ss` | ⚠️ | `-t`, `-u`, `-w`, `-x`, `-a`, `-l`, `-p`, `-n`, `-m`, `-o`, `-i`, `-s`, `-4`, `-6`, `-Z` | JSON: `-j` / `-H`. Rustux: C program (step D2); `-t -u -l -a -n -H`; no `-p`, `-x`, `-m`, `-i`, `-s`, no JSON |
+| `ping` | ✅ | `-c`, `-i`, `-W`, `-s`, `-t`, `-4`, `-6`, `-O` | JSON: `-O` (summary). Rustux: C program (step D1, D4); `-c -i -W -w -s -q -4 -6`, names; no `-t`, `-O`, no JSON |
 | `traceroute` | ⬜ | `-4`, `-6`, `-n`, `-w`, `-q`, `-m`, `-p`, `-z` | JSON: `--json` |
 | `tracepath` | ⬜ | `-n`, `-4`, `-6`, `-b` | JSON: `--json` |
 | `arp` | ⬜ | `-a`, `-d`, `-n`, `-v`, `-i` | JSON: `--json` |
@@ -329,7 +180,7 @@ Only the Debian/Ubuntu package tools are renamed; every other command keeps its 
 | `iwconfig` | ⬜ | | |
 | `iwlist` | ⬜ | `scan`, `wlan` | |
 | `rfkill` | ⬜ | `list`, `block`, `unblock`, `-J` | JSON: `-J` |
-| `curl` | ⬜ | `-o`, `-O`, `-I`, `-v`, `-s`, `-w`, `-H`, `-d`, `-X`, `-A`, `-u`, `-x`, `-k`, `--head`, `--get` | JSON: `-w "%{json}"` |
+| `curl` | ⚠️ | `-o`, `-O`, `-I`, `-v`, `-s`, `-w`, `-H`, `-d`, `-X`, `-A`, `-u`, `-x`, `-k`, `--head`, `--get` | JSON: `-w "%{json}"`. Rustux: Rust, ureq on rustls (step D3); `-o -O -L -I -i -f -s -S -v -k -H -d -X -A -u -m -w --cacert --connect-timeout`; no `-x` (proxies), no `%{json}` |
 | `wget` | ⬜ | `-O`, `-o`, `-c`, `-r`, `-b`, `-q`, `-v`, `-t` | |
 | `ftp` | ⬜ | | |
 | `sftp` | ⬜ | `-b`, `-o`, `-P` | Batch mode |
@@ -338,10 +189,14 @@ Only the Debian/Ubuntu package tools are renamed; every other command keeps its 
 | `ssh-keygen` | ⬜ | `-t`, `-b`, `-C`, `-f`, `-l`, `-p`, `-y`, `-e`, `-q` | JSON: `-l -f` |
 | `ssh-copy-id` | ⬜ | `-i`, `-f`, `-o` | |
 | `telnet` | ⬜ | | |
-| `nc` | ⬜ | `-l`, `-p`, `-v`, `-z`, `-w`, `-q`, `-u` | |
+| `nc` | ✅ | `-l`, `-p`, `-v`, `-z`, `-w`, `-q`, `-u` | Rustux: C program (step D2), OpenBSD netcat's `-l -k -u -v -z -N -w -s -p`; no `-q` |
 | `whois` | ⬜ | `-h`, `-p` | |
 | `dig` | ⬜ | `@server`, `+short`, `+json`, `-x`, `-t`, `any`, `ns`, `soa` | JSON: `+json` |
-| `nslookup` | ⬜ | `-type`, `-port`, `-debug` | JSON: `-json` |
+| `nslookup` | ⚠️ | `-type`, `-port`, `-debug` | JSON: `-json`. Rustux: C program (step D3), with `host`; no interactive mode, no JSON |
+| `host` | ⚠️ | `-t`, `-v`, a server | Rustux: C program (step D3); A, AAAA, MX, PTR; no JSON |
+| `sshd` | ⚠️ | `-d`, `/etc/ssh/sshd_config` | Rustux: Rust, on the sunset crate (step D5); passwords and Ed25519 keys, pseudo-terminals; no scp/sftp subsystems, no forwarding |
+| `fwctl` | ✅ | `allow`, `deny`, `append`, `delete`, `default`, `enable`, `disable`, `reload`, `save` | Rustux's own firewall tool (step D5), no iptables/nftables |
+| `netcfg` | ✅ | `IFACE dhcp`, `static`, `off`, `dns`, `search`, `apply` | Rustux's own (step D6): `/etc/network.conf` applied at once; Settings > Network uses it |
 
 ---
 
@@ -607,7 +462,7 @@ Statuses are for Rustux (checklist step 11 of the rustux repo). Its `docs/COMMAN
 
 ## Priority Implementation Order
 
-1. **Phase 1 - Core Package Management**: `app`, `app-get`, `rpg`, `rpg-query`
+1. **Phase 1 - Core Package Management**: `rpg` (`PACKAGES.md`, Rustux phase E)
 2. **Phase 2 - Basic System Info**: `uname`, `lsb_release`, `hostname`, `free`, `df`, `lsblk`
 3. **Phase 3 - File Operations**: `ls`, `cp`, `mv`, `rm`, `mkdir`, `cat`
 4. **Phase 4 - Network**: `ip`, `ss`, `ping`, `curl`, `ssh`

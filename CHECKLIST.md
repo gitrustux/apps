@@ -26,13 +26,13 @@ Package files are `.rpg`. One repository for every edition: `https://rustux.com/
 | `rpg update` | ⬜ | | The sources' `Release` (signature checked) and indexes; apt update |
 | `rpg upgrade` | ⬜ | `-y`, `--download-only` | Every upgradable package, new dependencies included; apt upgrade and full-upgrade |
 | `rpg install NAME...` | ⬜ | `-y`, `--download-only`, `--no-recommends` | With dependencies; apt install |
-| `rpg install ./FILE.rpg` | ⬜ | `-y` | A package file; dpkg -i |
-| `rpg remove NAME...` | ⬜ | `-y`, `--purge` | apt remove / purge |
+| `rpg install ./FILE.rpg` | ✅ | `-y` | A package file; dpkg -i. Step E1. |
+| `rpg remove NAME...` | ✅ | `-y`, `--purge` | apt remove / purge. Step E1; no `-y` needed (no questions yet). |
 | `rpg autoremove` | ⬜ | `-y` | Dependencies no longer needed |
 | `rpg search TEXT` | ⬜ | `--names-only`, `--installed` | apt search. JSON: `--json` |
-| `rpg show NAME` | ⬜ | | apt show. JSON: `--json` |
+| `rpg show NAME` | ✅ | | apt show. JSON: `--json` |
 | `rpg policy NAME` | ⬜ | | Installed and candidate versions, from which source; apt-cache policy |
-| `rpg list` | ⬜ | `--installed`, `--upgradable`, `--held` | apt list. JSON: `--json` |
+| `rpg list` | ⚠️ | `--installed`, `--upgradable`, `--held` | apt list. JSON: `--json`. Step E1: `--installed`, `--json`; `--upgradable`, `--held` with E2. |
 | `rpg depends NAME`, `rpg rdepends NAME` | ⬜ | | apt-cache depends / rdepends |
 | `rpg hold NAME`, `rpg unhold NAME` | ⬜ | | apt-mark hold |
 | `rpg source list`, `rpg source add LINE`, `rpg source remove N` | ⬜ | | `/etc/rpg/sources.list`; add-apt-repository |
@@ -44,11 +44,11 @@ Package files are `.rpg`. One repository for every edition: `https://rustux.com/
 
 | Command | Status | Key Flags | Notes |
 |---------|--------|-----------|-------|
-| `rpg files NAME` | ⬜ | | The files a package installed; dpkg -L |
-| `rpg owner PATH` | ⬜ | | Which package a file belongs to; dpkg -S |
-| `rpg verify [NAME]` | ⬜ | | Files changed or missing (SHA-256); dpkg -V |
-| `rpg fix` | ⬜ | | Finishes or undoes an interrupted install; dpkg --configure -a, apt --fix-broken |
-| `rpg info ./FILE.rpg` | ⬜ | | A package file's control and files; dpkg-deb -I / -c |
+| `rpg files NAME` | ✅ | | The files a package installed; dpkg -L |
+| `rpg owner PATH` | ✅ | | Which package a file belongs to; dpkg -S |
+| `rpg verify [NAME]` | ✅ | | Files changed or missing (SHA-256); dpkg -V |
+| `rpg fix` | ✅ | | Finishes or undoes an interrupted install; dpkg --configure -a, apt --fix-broken |
+| `rpg info ./FILE.rpg` | ✅ | | A package file's control and files; dpkg-deb -I / -c |
 
 ### 1.3 Apps (FoxDen, the app store)
 
@@ -67,7 +67,7 @@ Apps are kept apart from the system: `.rpg` packages of their own kind from `htt
 
 | Command | Status | Key Flags | Notes |
 |---------|--------|-----------|-------|
-| `rpg build DIR` | ⬜ | `-o FILE` | A `.rpg` from a `control` file and a tree; dpkg-deb --build |
+| `rpg build DIR` | ✅ | `-o FILE` | A `.rpg` from a `control` file and a tree; dpkg-deb --build |
 | `rpg index DIR` | ⬜ | `--apps` | `Packages.gz` and `Release` for a folder of packages (`--apps`: FoxDen's `Apps.json.gz` with the store metadata); apt-ftparchive. Signing is separate: `openssl pkeyutl -sign -rawin` with the archive key |
 
 ---

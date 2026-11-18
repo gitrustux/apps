@@ -48,7 +48,8 @@ Package files are `.rpg`. One repository for every edition: `https://rustux.com/
 | `rpg owner PATH` | ✅ | | Which package a file belongs to; dpkg -S |
 | `rpg verify [NAME]` | ✅ | | Files changed or missing (SHA-256); dpkg -V |
 | `rpg fix` | ✅ | | Finishes or undoes an interrupted install; dpkg --configure -a, apt --fix-broken |
-| `rpg info ./FILE.rpg` | ✅ | | A package file's control and files; dpkg-deb -I / -c |
+| `rpg info ./FILE.rpg` | ✅ | | A package file's control and files; dpkg-deb -I / -c |
+| `rpg boot list`, `rpg boot update` | ✅ | | The system images on the EFI partition, and rboot's entries for them (the newest, the previous ones, the edition's default); the image packages run `update`. Step E3: the system is image-based, `rustica-system-VERSION` packages beside each other, `rustica-server` or `rustica-desktop` the edition; kernel-install / update-grub. |
 
 ### 1.3 Apps (FoxDen, the app store)
 
@@ -356,7 +357,7 @@ Apps are kept apart from the system: `.rpg` packages of their own kind from `htt
 | `systemctl` | ⚠️ | `start`, `stop`, `restart`, `reload`, `status`, `enable`, `disable`, `is-enabled`, `is-active`, `list-units`, `list-unit-files`, `daemon-reload`, `show`, `cat`, `set-property`, `reset-failed`, `list-jobs`, `list-timers`, `list-sockets` | JSON: `--output=json`. Rustux: `svc` (C program, step 18; systemctl is another name for it), units in `/etc/svc`: all but `set-property`, `list-jobs`, `list-timers`, `list-sockets`; also `isolate`, `is-failed`, `get-default`, `poweroff`, `reboot`; `reload UNIT` restarts it; `--json` |
 | `bootctl` | ⚠️ | `status`, `list`, `set-default`, `set-oneshot`, `set-timeout`, `reboot-to-firmware`, `install`, `update`, `remove`, `is-installed`, `--esp-path` | JSON: `--json=`. Rustux: C program (step 19) for the boot manager rboot: all but `install`, `update`, `remove` (step 20); no JSON |
 | `efibootmgr` | ⚠️ | `-v`, `-o`, `-n`, `-N`, `-b`, `-B`, `-a`, `-A`, `-c`, `-d`, `-p`, `-l`, `-L`, `-t`, `-T`, `-q` | Rustux: C program (step 19): all of these; no `-r`, `-e`, `-@`, `-u` |
-| `rustica-install` | ✅ | `--disk`, `--mode`, `--esp`, `--root`, `--user`, `--password-file`, `--lock-root`, `--hostname`, `--timezone`, `--keymap`, `--yes`, `--dry-run` | Rustica's own installer (step 20; like Debian's or Ubuntu's): interactive by default, every change shown before writing |
+| `rustica-install` | ✅ | `--disk`, `--mode`, `--esp`, `--root`, `--user`, `--password-file`, `--lock-root`, `--hostname`, `--timezone`, `--keymap`, `--edition`, `--yes`, `--dry-run` | Rustica's own installer (step 20; like Debian's or Ubuntu's): interactive by default, every change shown before writing; step E3: the edition (server or desktop), the system installed as packages (rpg) |
 | `systemd-analyze` | ⬜ | `time`, `blame`, `critical-chain`, `dot`, `dump`, `set-log-level`, `get-log-level`, `verify`, `calendar`, `unit-files`, `unit-paths`, `exit-statuses` | JSON: `--json=` |
 | `systemd-cgtop` | ⬜ | `-p`, `-k`, `-K`, `-t`, `-m`, `--batch` | |
 | `systemd-resolve` | ⬜ | `status`, `query`, `service`, `openpgp`, `statistics`, `reset-statistics`, `flush-caches` | JSON: `--json=` |

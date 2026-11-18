@@ -23,22 +23,22 @@ Package files are `.rpg`. One repository for every edition: `https://rustux.com/
 
 | Command | Status | Key Flags | Notes |
 |---------|--------|-----------|-------|
-| `rpg update` | ⬜ | | The sources' `Release` (signature checked) and indexes; apt update |
-| `rpg upgrade` | ⬜ | `-y`, `--download-only` | Every upgradable package, new dependencies included; apt upgrade and full-upgrade |
-| `rpg install NAME...` | ⬜ | `-y`, `--download-only`, `--no-recommends` | With dependencies; apt install |
+| `rpg update` | ✅ | | The sources' `Release` (signature checked) and indexes; apt update |
+| `rpg upgrade` | ✅ | `-y`, `--download-only` | Every upgradable package, new dependencies included; apt upgrade and full-upgrade. Step E2; no `--download-only` yet. |
+| `rpg install NAME...` | ✅ | `-y`, `--download-only`, `--no-recommends` | With dependencies; apt install. Step E2: dependencies from the sources; no `--download-only`, `--no-recommends` (no Recommends yet). |
 | `rpg install ./FILE.rpg` | ✅ | `-y` | A package file; dpkg -i. Step E1. |
 | `rpg remove NAME...` | ✅ | `-y`, `--purge` | apt remove / purge. Step E1; no `-y` needed (no questions yet). |
-| `rpg autoremove` | ⬜ | `-y` | Dependencies no longer needed |
-| `rpg search TEXT` | ⬜ | `--names-only`, `--installed` | apt search. JSON: `--json` |
+| `rpg autoremove` | ✅ | `-y` | Dependencies no longer needed |
+| `rpg search TEXT` | ✅ | `--names-only`, `--installed` | apt search. JSON: `--json`. Step E2 (it marks what is installed); no `--installed` filter or `--json` yet. |
 | `rpg show NAME` | ✅ | | apt show. JSON: `--json` |
-| `rpg policy NAME` | ⬜ | | Installed and candidate versions, from which source; apt-cache policy |
-| `rpg list` | ⚠️ | `--installed`, `--upgradable`, `--held` | apt list. JSON: `--json`. Step E1: `--installed`, `--json`; `--upgradable`, `--held` with E2. |
-| `rpg depends NAME`, `rpg rdepends NAME` | ⬜ | | apt-cache depends / rdepends |
-| `rpg hold NAME`, `rpg unhold NAME` | ⬜ | | apt-mark hold |
-| `rpg source list`, `rpg source add LINE`, `rpg source remove N` | ⬜ | | `/etc/rpg/sources.list`; add-apt-repository |
-| `rpg key list`, `rpg key add FILE`, `rpg key remove ID` | ⬜ | | `/etc/rpg/keys/`; apt-key |
-| `rpg download NAME` | ⬜ | | Into the current folder; apt download |
-| `rpg clean` | ⬜ | | `/var/cache/rpg/archives/`; apt clean |
+| `rpg policy NAME` | ✅ | | Installed and candidate versions, from which source; apt-cache policy |
+| `rpg list` | ✅ | `--installed`, `--upgradable`, `--held` | apt list. JSON: `--json`. Step E1: `--installed`, `--json`; `--upgradable`, `--held` with E2. Steps E1-E2: `--installed`, `--upgradable`, `--held`, `--json` (installed). |
+| `rpg depends NAME`, `rpg rdepends NAME` | ✅ | | apt-cache depends / rdepends |
+| `rpg hold NAME`, `rpg unhold NAME` | ✅ | | apt-mark hold |
+| `rpg source list`, `rpg source add LINE`, `rpg source remove N` | ✅ | | `/etc/rpg/sources.list`; add-apt-repository |
+| `rpg key list`, `rpg key add FILE`, `rpg key remove ID` | ✅ | | `/etc/rpg/keys/`; apt-key |
+| `rpg download NAME` | ✅ | | Into the current folder; apt download |
+| `rpg clean` | ✅ | | `/var/cache/rpg/archives/`; apt clean |
 
 ### 1.2 Installed packages (dpkg's part)
 
@@ -68,7 +68,7 @@ Apps are kept apart from the system: `.rpg` packages of their own kind from `htt
 | Command | Status | Key Flags | Notes |
 |---------|--------|-----------|-------|
 | `rpg build DIR` | ✅ | `-o FILE` | A `.rpg` from a `control` file and a tree; dpkg-deb --build |
-| `rpg index DIR` | ⬜ | `--apps` | `Packages.gz` and `Release` for a folder of packages (`--apps`: FoxDen's `Apps.json.gz` with the store metadata); apt-ftparchive. Signing is separate: `openssl pkeyutl -sign -rawin` with the archive key |
+| `rpg index DIR` | ⚠️ | `--apps` | `Packages.gz` and `Release` for a folder of packages (`--apps`: FoxDen's `Apps.json.gz` with the store metadata); apt-ftparchive. Signing is separate: `openssl pkeyutl -sign -rawin` with the archive key. Step E2: system repositories; `--apps` with FoxDen (FD3). |
 
 ---
 

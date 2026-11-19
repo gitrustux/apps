@@ -61,8 +61,8 @@ Apps are kept apart from the system: `.rpg` packages of their own kind from `htt
 | `rpg install ID` | ⚠️ | `-y` | An app, `rpg install org.rustica.calculator`; no administrator needed for a sandboxed app. Step FD1: from a package file (`rpg install ./org.rustica.example_1.0_x86_64.rpg`, root) into `/apps/ID` alone, checked (`docs/FOXDEN.md`); by its ID from the apps repository with FD3, as a user with FD4 |
 | `rpg remove ID` | ✅ | `--purge` | The app's folder; `--purge`: the users' data for it too (`~/.local/share/apps/ID`, `~/.config/apps/ID`, `~/.cache/apps/ID` of every home). Step FD1 |
 | `rpg list --apps` | ✅ | | Installed apps: ID, version, name and summary from the manifest. JSON: `--json`. Step FD1 |
-| `rpg permissions ID` | ⬜ | `grant PERMISSION`, `revoke PERMISSION` | `network`, `files:documents`, ... |
-| `appctl run ID` | ⬜ | | Starts an app in its sandbox (the launcher uses it) |
+| `rpg permissions ID` | ⬜ | `grant PERMISSION`, `revoke PERMISSION` | `network`, `files:documents`, ...; until then a line in `~/.config/apps/permissions` (`appctl`, step FD2) |
+| `appctl run ID` | ✅ | `view ID`, `permissions ID` | Starts an app in its sandbox (the launcher uses it): its own root (an fsd view) and a job with the sandbox policy; permissions narrowed in `~/.config/apps/permissions`. Step FD2 (rustux `docs/FOXDEN.md`) |
 | `foxden [ID]` | ⬜ | | The app store (graphical); an app's page |
 
 ### 1.4 Making packages and repositories (the publishing side)

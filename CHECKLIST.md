@@ -73,6 +73,7 @@ Apps are kept apart from the system: `.rpg` packages of their own kind from `htt
 |---------|--------|-----------|-------|
 | `rpg build DIR` | ✅ | `-o FILE` | A `.rpg` from a `control` file and a tree; dpkg-deb --build |
 | `rpg index DIR` | ✅ | `--apps`, `--platform N` | `Packages.gz` and `Release` for a folder of packages (`--apps`: an apps repository, `platform/N/` with `Apps.gz` and `Apps.json.gz` carrying the store metadata, and `media/ID/` with the icons); apt-ftparchive. Signing is separate: `openssl pkeyutl -sign -rawin` with the archive key (the apps key for `--apps`). Step E2: system repositories; `--apps` FoxDen step FD3 (`scripts/publish-apps.sh`). Step E5: `scripts/publish-repo.sh` (rustux) runs it, signs and checks the repository rustux.com serves, from each handoff (`docs/RELEASES.md`). |
+| `rpg dev` | ✅ | `digest DIR`, `verify DIR KEY.pub`, `check-package FILE.rpg DIR` | Outside developers' apps (FoxDen step FD7a, rustux `docs/FOXDEN.md`): what a developer signs (their app's folder: `openssl pkeyutl -sign -rawin` into `SIGNATURE`), checking that signature, and checking that a package is that folder built (the same files, only its program added). Used by the `gitrustux/foxden-apps` repository's checks and rustux.com's publishing (`scripts/fetch-outside-apps.sh`). |
 
 ---
 

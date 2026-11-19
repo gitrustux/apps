@@ -24,7 +24,8 @@ Package files are `.rpg`. One repository for every edition: `https://rustux.com/
 | Command | Status | Key Flags | Notes |
 |---------|--------|-----------|-------|
 | `rpg update` | ✅ | | The sources' `Release` (signature checked) and indexes; apt update |
-| `rpg upgrade` | ✅ | `-y`, `--download-only` | Every upgradable package, new dependencies included; apt upgrade and full-upgrade. Step E2; no `--download-only` yet. |
+| `rpg upgrade` | ✅ | `-y`, `--download-only`, `--plan` | Every upgradable package, new dependencies included; apt upgrade and full-upgrade. Step E2; no `--download-only` yet. Step E6: `--plan` says what it would do, a line a package with its size (for the installer service). |
+| `updates` | ✅ | `status`, `check`, `install [-S]` | The system's updates through the installer service `/svc/packages` (packagesd: a daily check, what the panel's "Updates (N)" and Settings > Updates use); an administrator needs no sudo. Like Ubuntu's update-manager/unattended-upgrades check, from a terminal. Step E6. |
 | `rpg install NAME...` | ✅ | `-y`, `--download-only`, `--no-recommends` | With dependencies; apt install. Step E2: dependencies from the sources; no `--download-only`, `--no-recommends` (no Recommends yet). |
 | `rpg install ./FILE.rpg` | ✅ | `-y` | A package file; dpkg -i. Step E1. |
 | `rpg remove NAME...` | ✅ | `-y`, `--purge` | apt remove / purge. Step E1; no `-y` needed (no questions yet). |

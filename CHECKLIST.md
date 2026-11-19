@@ -65,7 +65,7 @@ Apps are kept apart from the system: `.rpg` packages of their own kind from `htt
 | `rpg source add apps URL platform N`, `rpg key add --apps FILE` | ✅ | | App sources (`apps https://rustux.com/download/apps platform 1` in the image) and the keys trusted for them only. Step FD3 |
 | `rpg permissions ID` | ⬜ | `grant PERMISSION`, `revoke PERMISSION` | `network`, `files:documents`, ...; until then a line in `~/.config/apps/permissions` (`appctl`, step FD2) |
 | `appctl run ID` | ✅ | `view ID`, `permissions ID` | Starts an app in its sandbox (the launcher uses it): its own root (an fsd view) and a job with the sandbox policy; permissions narrowed in `~/.config/apps/permissions`. Step FD2 (rustux `docs/FOXDEN.md`) |
-| `foxden [ID]` | ⬜ | | The app store (graphical); an app's page |
+| `foxden [ID]` | ✅ | `--updates` | The app store (graphical): Home, Categories, Search, an app's page (Install, Open, Update, Remove; screenshots; permissions in plain words), Installed (permissions changeable), Updates; through rpg and the installer service, an administrator's password asked in its own sheet. Step FD5 (rustux `docs/FOXDEN.md`) |
 
 ### 1.4 Making packages and repositories (the publishing side)
 

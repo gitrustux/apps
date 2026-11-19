@@ -58,8 +58,8 @@ Apps are kept apart from the system: `.rpg` packages of their own kind from `htt
 
 | Command | Status | Key Flags | Notes |
 |---------|--------|-----------|-------|
-| `rpg install ID` | ⚠️ | `-y` | An app, `rpg install org.rustica.calculator`; no administrator needed for a sandboxed app. Step FD1: from a package file (`rpg install ./org.rustica.example_1.0_x86_64.rpg`) into `/apps/ID` alone, checked (`docs/FOXDEN.md`); step FD3: by its ID from the apps repository (an app source, signed with the apps key), showing what it asks for; root for now, as a user with FD4 |
-| `rpg remove ID` | ✅ | `--purge` | The app's folder; `--purge`: the users' data for it too (`~/.local/share/apps/ID`, `~/.config/apps/ID`, `~/.cache/apps/ID` of every home). Step FD1 |
+| `rpg install ID` | ✅ | `-y` | An app, `rpg install org.rustica.calculator`; no administrator needed for a sandboxed app. Step FD1: from a package file (`rpg install ./org.rustica.example_1.0_x86_64.rpg`) into `/apps/ID` alone, checked (`docs/FOXDEN.md`); step FD3: by its ID from the apps repository (an app source, signed with the apps key), showing what it asks for; step FD4: any user, through the installer service (an administrator's password for an app asking `files:home` or `system`, a package file, a system package) |
+| `rpg remove ID` | ✅ | `--purge` | The app's folder; `--purge`: the users' data for it too (`~/.local/share/apps/ID`, `~/.config/apps/ID`, `~/.cache/apps/ID` of every home). Step FD1; any user since FD4 (`--purge` an administrator) |
 | `rpg list --apps` | ✅ | | Installed apps: ID, version, name and summary from the manifest. JSON: `--json`. Step FD1 |
 | `rpg search WORD` (apps) | ✅ | `--names-only` | Apps by ID, name, summary and category, marked `(app)`; `rpg upgrade` upgrades apps with the system. Step FD3 |
 | `rpg source add apps URL platform N`, `rpg key add --apps FILE` | ✅ | | App sources (`apps https://rustux.com/download/apps platform 1` in the image) and the keys trusted for them only. Step FD3 |

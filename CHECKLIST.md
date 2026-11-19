@@ -58,9 +58,11 @@ Apps are kept apart from the system: `.rpg` packages of their own kind from `htt
 
 | Command | Status | Key Flags | Notes |
 |---------|--------|-----------|-------|
-| `rpg install ID` | ⚠️ | `-y` | An app, `rpg install org.rustica.calculator`; no administrator needed for a sandboxed app. Step FD1: from a package file (`rpg install ./org.rustica.example_1.0_x86_64.rpg`, root) into `/apps/ID` alone, checked (`docs/FOXDEN.md`); by its ID from the apps repository with FD3, as a user with FD4 |
+| `rpg install ID` | ⚠️ | `-y` | An app, `rpg install org.rustica.calculator`; no administrator needed for a sandboxed app. Step FD1: from a package file (`rpg install ./org.rustica.example_1.0_x86_64.rpg`) into `/apps/ID` alone, checked (`docs/FOXDEN.md`); step FD3: by its ID from the apps repository (an app source, signed with the apps key), showing what it asks for; root for now, as a user with FD4 |
 | `rpg remove ID` | ✅ | `--purge` | The app's folder; `--purge`: the users' data for it too (`~/.local/share/apps/ID`, `~/.config/apps/ID`, `~/.cache/apps/ID` of every home). Step FD1 |
 | `rpg list --apps` | ✅ | | Installed apps: ID, version, name and summary from the manifest. JSON: `--json`. Step FD1 |
+| `rpg search WORD` (apps) | ✅ | `--names-only` | Apps by ID, name, summary and category, marked `(app)`; `rpg upgrade` upgrades apps with the system. Step FD3 |
+| `rpg source add apps URL platform N`, `rpg key add --apps FILE` | ✅ | | App sources (`apps https://rustux.com/download/apps platform 1` in the image) and the keys trusted for them only. Step FD3 |
 | `rpg permissions ID` | ⬜ | `grant PERMISSION`, `revoke PERMISSION` | `network`, `files:documents`, ...; until then a line in `~/.config/apps/permissions` (`appctl`, step FD2) |
 | `appctl run ID` | ✅ | `view ID`, `permissions ID` | Starts an app in its sandbox (the launcher uses it): its own root (an fsd view) and a job with the sandbox policy; permissions narrowed in `~/.config/apps/permissions`. Step FD2 (rustux `docs/FOXDEN.md`) |
 | `foxden [ID]` | ⬜ | | The app store (graphical); an app's page |
@@ -70,7 +72,7 @@ Apps are kept apart from the system: `.rpg` packages of their own kind from `htt
 | Command | Status | Key Flags | Notes |
 |---------|--------|-----------|-------|
 | `rpg build DIR` | ✅ | `-o FILE` | A `.rpg` from a `control` file and a tree; dpkg-deb --build |
-| `rpg index DIR` | ⚠️ | `--apps` | `Packages.gz` and `Release` for a folder of packages (`--apps`: FoxDen's `Apps.json.gz` with the store metadata); apt-ftparchive. Signing is separate: `openssl pkeyutl -sign -rawin` with the archive key. Step E2: system repositories; `--apps` with FoxDen (FD3). Step E5: `scripts/publish-repo.sh` (rustux) runs it, signs and checks the repository rustux.com serves, from each handoff (`docs/RELEASES.md`). |
+| `rpg index DIR` | ✅ | `--apps`, `--platform N` | `Packages.gz` and `Release` for a folder of packages (`--apps`: an apps repository, `platform/N/` with `Apps.gz` and `Apps.json.gz` carrying the store metadata, and `media/ID/` with the icons); apt-ftparchive. Signing is separate: `openssl pkeyutl -sign -rawin` with the archive key (the apps key for `--apps`). Step E2: system repositories; `--apps` FoxDen step FD3 (`scripts/publish-apps.sh`). Step E5: `scripts/publish-repo.sh` (rustux) runs it, signs and checks the repository rustux.com serves, from each handoff (`docs/RELEASES.md`). |
 
 ---
 

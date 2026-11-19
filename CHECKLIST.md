@@ -63,7 +63,7 @@ Apps are kept apart from the system: `.rpg` packages of their own kind from `htt
 | `rpg list --apps` | ✅ | | Installed apps: ID, version, name and summary from the manifest. JSON: `--json`. Step FD1 |
 | `rpg search WORD` (apps) | ✅ | `--names-only` | Apps by ID, name, summary and category, marked `(app)`; `rpg upgrade` upgrades apps with the system. Step FD3 |
 | `rpg source add apps URL platform N`, `rpg key add --apps FILE` | ✅ | | App sources (`apps https://rustux.com/download/apps platform 1` in the image) and the keys trusted for them only. Step FD3 |
-| `rpg permissions ID` | ⬜ | `grant PERMISSION`, `revoke PERMISSION` | `network`, `files:documents`, ...; until then a line in `~/.config/apps/permissions` (`appctl`, step FD2) |
+| `rpg permissions ID` | ✅ | `grant PERMISSION`, `revoke PERMISSION` | `network`, `files:documents`, ...: what the app asks for and what the user lets it have (`~/.config/apps/permissions`, as FoxDen's Installed and Settings > Apps). Step FD6 (rustux `docs/FOXDEN.md`) |
 | `appctl run ID` | ✅ | `view ID`, `permissions ID` | Starts an app in its sandbox (the launcher uses it): its own root (an fsd view) and a job with the sandbox policy; permissions narrowed in `~/.config/apps/permissions`. Step FD2 (rustux `docs/FOXDEN.md`) |
 | `foxden [ID]` | ✅ | `--updates` | The app store (graphical): Home, Categories, Search, an app's page (Install, Open, Update, Remove; screenshots; permissions in plain words), Installed (permissions changeable), Updates; through rpg and the installer service, an administrator's password asked in its own sheet. Step FD5 (rustux `docs/FOXDEN.md`) |
 
